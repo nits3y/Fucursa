@@ -62,3 +62,12 @@ npm install
 
 # Run the development server
 npm run dev
+
+
+
+# DB information 
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=root
+DB_NAME=fucursa
