@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  # This service runs MySQL 8.0 database for the Laravel application
+  mysql:
+    image: mysql:8.0
+    container_name: laravel_mysql
+    restart: unless-stopped
+    environment:
+      # Database configuration - creates 'fucursa' database
+      MYSQL_DATABASE: fucursa
+      MYSQL_ROOT_PASSWORD: root_password
+      # Creates a non-root user for Laravel to use
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: laravel_password
+      # Allows connections from any host (% wildcard)
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      # Maps host port 3306 to container port 3306
+      - "3306:3306"
+    volumes:
+      # Persists database data between container restarts
+      - mysql_data:/var/lib/mysql
+      # Mounts initialization scripts directory (if exists)
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - laravel_network
+    # Uses native password authentication for compatibility
+    command: --default-authentication-plugin=mysql_native_password
+
+  # phpMyAdmin Web Interface
+  # Provides a web-based MySQL administration tool
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel_phpmyadmin
+    restart: unless-stopped
+    environment:
+      # Points to the MySQL service defined above
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      # Uses root credentials to access MySQL
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+    ports:
+      # Maps host port 8080 to container port 80
+      - "8080:80"
+    depends_on:
+      # Ensures MySQL starts before phpMyAdmin
+      - mysql
+    networks:
+      - laravel_network
+
+# Named volumes for persistent data storage
+volumes:
+  mysql_data:
+    driver: local
+
+# Custom network for service communication
+networks:
+  laravel_network:
+    driver: bridge
