@@ -3,200 +3,84 @@
 import { useState } from 'react';
 import LoginModal from '@/components/LoginModal';
 import JoinExamModal from '@/components/JoinExamModal';
-import { BookOpen, GraduationCap, Shield, Clock, Users, CheckCircle } from 'lucide-react';
+import { BookOpen, GraduationCap, Users, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showJoinExamModal, setShowJoinExamModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Fucursa
-              </h1>
-            </div>
-            <div className="text-sm text-gray-600">
-              Secure Online Exam Platform
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-2xl animate-pulse delay-500"></div>
+      </div>
 
-      {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Main Content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6">
+        {/* Logo Section */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Secure Online Examinations
-            <span className="block text-3xl sm:text-4xl text-blue-600 mt-2">
-              with Anti-Cheating Measures
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
-            Fucursa provides a secure platform for conducting online exams with advanced anti-cheating 
-            features including fullscreen lock, tab-switch prevention, and real-time monitoring.
+          <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl shadow-2xl mb-6 relative">
+              <BookOpen className="h-12 w-12 text-white" />
+              <div className="absolute -top-1 -right-1">
+                <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+              </div>
+            </div>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4 tracking-tight">
+            Fucursa
+          </h1>
+          
+          <p className="text-gray-300 text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
+            Secure Online Examination Platform
+            <span className="block text-lg text-gray-400 mt-2">with Advanced Anti-Cheating Technology</span>
           </p>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center space-x-3 w-full sm:w-auto"
-            >
-              <GraduationCap className="h-6 w-6" />
-              <span>Teacher Login</span>
-            </button>
-            
-            <button
-              onClick={() => setShowJoinExamModal(true)}
-              className="group bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center space-x-3 w-full sm:w-auto"
-            >
-              <Users className="h-6 w-6" />
-              <span>Join Exam</span>
-            </button>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-6 mb-16">
+          <button
+            onClick={() => setShowLoginModal(true)}
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-2 transition-all duration-300 flex items-center space-x-4 min-w-[240px] justify-center"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <GraduationCap className="h-7 w-7 relative z-10" />
+            <span className="relative z-10">Teacher Login</span>
+          </button>
+          
+          <button
+            onClick={() => setShowJoinExamModal(true)}
+            className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-purple-500/25 transform hover:-translate-y-2 transition-all duration-300 flex items-center space-x-4 min-w-[240px] justify-center"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Users className="h-7 w-7 relative z-10" />
+            <span className="relative z-10">Join Exam</span>
+          </button>
+        </div>
+
+        {/* Author Credit */}
+        <div className="text-center">
+          <div className="inline-flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 hover:bg-white/10 transition-all duration-300 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-white font-bold text-sm">YP</span>
+            </div>
+            <div className="text-left">
+              <p className="text-white font-semibold text-sm">Created by</p>
+              <p className="text-gray-300 text-xs">Yestin Prado</p>
+            </div>
           </div>
         </div>
 
-        {/* Features Section */}
-        <div className="grid md:grid-cols-2 gap-12 mb-16">
-          {/* Student Features */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-purple-100 p-3 rounded-lg">
-                <Users className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900">For Students</h3>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Secure Exam Mode</div>
-                  <div className="text-gray-600">Prevents tab switching, Alt+Tab, and exiting fullscreen</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Auto Start on Fullscreen</div>
-                  <div className="text-gray-600">Exam begins automatically when fullscreen is enabled</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Simple Join Process</div>
-                  <div className="text-gray-600">Enter your name and exam ID to get started</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Time-Limited Exams</div>
-                  <div className="text-gray-600">Clear countdown timer for fair duration</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* Teacher Features */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900">For Teachers</h3>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Login Dashboard</div>
-                  <div className="text-gray-600">Access to all created exams and management tools</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Exam Management</div>
-                  <div className="text-gray-600">Create, view, and manage all your exams</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Real-Time Control</div>
-                  <div className="text-gray-600">Set time limits and monitor exam sessions</div>
-                </div>
-              </li>
-              <li className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="font-semibold text-gray-900">Anti-Cheating Features</div>
-                  <div className="text-gray-600">Advanced security measures and monitoring</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Security Features */}
-        <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl p-8 border border-red-100">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <div className="bg-red-100 p-3 rounded-lg">
-              <Shield className="h-6 w-6 text-red-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900">Security Features</h3>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="bg-white p-4 rounded-lg shadow-sm mb-3">
-                <Shield className="h-8 w-8 text-red-600 mx-auto" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Fullscreen Lock</h4>
-              <p className="text-gray-600 text-sm">Prevents students from exiting fullscreen mode during exams</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-white p-4 rounded-lg shadow-sm mb-3">
-                <Clock className="h-8 w-8 text-red-600 mx-auto" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Tab Detection</h4>
-              <p className="text-gray-600 text-sm">Monitors and prevents tab switching and Alt+Tab usage</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-white p-4 rounded-lg shadow-sm mb-3">
-                <BookOpen className="h-8 w-8 text-red-600 mx-auto" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Auto-Start</h4>
-              <p className="text-gray-600 text-sm">Exam begins automatically when security conditions are met</p>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold">Fucursa</h3>
-            </div>
-            <p className="text-gray-400">
-              Secure Online Exam Platform with Advanced Anti-Cheating Measures
-            </p>
-          </div>
-        </div>
-      </footer>
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-ping opacity-75"></div>
+        <div className="absolute top-32 right-32 w-1 h-1 bg-purple-400 rounded-full animate-ping delay-300 opacity-75"></div>
+        <div className="absolute bottom-20 left-32 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping delay-700 opacity-75"></div>
+        <div className="absolute bottom-32 right-20 w-2 h-2 bg-pink-400 rounded-full animate-ping delay-1000 opacity-75"></div>
+      </div>
 
       {/* Modals */}
       {showLoginModal && (
