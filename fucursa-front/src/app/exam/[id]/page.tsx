@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Clock, AlertTriangle, Shield, Eye, EyeOff } from 'lucide-react';
+import CountdownTimer from '../../components/CountdownTimer';
 
 interface Question {
   id: string;
@@ -35,14 +36,11 @@ export default function ExamPage() {
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [isExamSubmitted, setIsExamSubmitted] = useState(false);
   const [isReenteringFullscreen, setIsReenteringFullscreen] = useState(false);
-  const [countdown, setCountdown] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(false);
-
   const [isSubmittingExam, setIsSubmittingExam] = useState(false);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const securityCheckRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // Mock exam data
   const mockExamData: ExamData = {
@@ -83,15 +81,28 @@ export default function ExamPage() {
   // Security functions
   const enterFullscreen = async () => {
     try {
+      // Check if already in fullscreen mode
+      if (document.fullscreenElement) {
+        console.log('Already in fullscreen mode');
+        setIsFullscreen(true);
+        return true;
+      }
+
       const element = document.documentElement;
+      console.log('Attempting to enter fullscreen mode...');
+      
       if (element.requestFullscreen) {
         await element.requestFullscreen();
       } else if ((element as any).webkitRequestFullscreen) {
         await (element as any).webkitRequestFullscreen();
       } else if ((element as any).msRequestFullscreen) {
         await (element as any).msRequestFullscreen();
+      } else {
+        throw new Error('Fullscreen API not supported');
       }
+      
       setIsFullscreen(true);
+      console.log('Successfully entered fullscreen mode');
       return true;
     } catch (error) {
       console.error('Failed to enter fullscreen:', error);
@@ -102,50 +113,53 @@ export default function ExamPage() {
 
   const exitFullscreen = async () => {
     try {
-      if (document.exitFullscreen) {
+      // Check if document is actually in fullscreen mode before trying to exit
+      if (document.fullscreenElement && document.exitFullscreen) {
+        console.log('Exiting fullscreen mode...');
         await document.exitFullscreen();
+      } else {
+        console.log('Document is not in fullscreen mode, skipping exit');
       }
       setIsFullscreen(false);
     } catch (error) {
       console.error('Failed to exit fullscreen:', error);
+      // Even if exit fails, update our state to reflect reality
+      setIsFullscreen(false);
     }
   };
 
-  const startCountdown = () => {
-    // Clear any existing countdown first
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-    }
-    
-    setCountdown(8);
-    setIsCountingDown(true);
-    
-    console.log('Starting countdown from 8 seconds'); // Debug log
-    
-    countdownRef.current = setInterval(() => {
-      setCountdown((prev) => {
-        console.log('Countdown tick:', prev); // Debug log
-        if (prev <= 1) {
-          // Time's up, auto-submit exam
-          console.log('Countdown reached 0, auto-submitting exam'); // Debug log
-          handleSubmitExam(true);
-          clearInterval(countdownRef.current!);
-          setIsCountingDown(false);
-          setShowSecurityModal(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const stopCountdown = () => {
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
+  /**
+   * Handles countdown completion - auto-submits the exam
+   */
+  const handleCountdownComplete = () => {
+    console.log('Countdown completed, auto-submitting exam');
     setIsCountingDown(false);
-    setCountdown(0);
+    setShowSecurityModal(false);
+    handleSubmitExam(true);
+  };
+
+  /**
+   * Handles countdown reset/stop
+   */
+  const handleCountdownReset = () => {
+    console.log('Countdown reset');
+    setIsCountingDown(false);
+  };
+
+  /**
+   * Starts the security countdown timer
+   */
+  const startCountdown = () => {
+    console.log('Starting security countdown');
+    setIsCountingDown(true);
+  };
+
+  /**
+   * Stops the security countdown timer
+   */
+  const stopCountdown = () => {
+    console.log('Stopping security countdown');
+    setIsCountingDown(false);
   };
 
   const handleSecurityViolation = (type: string) => {
@@ -253,10 +267,6 @@ export default function ExamPage() {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('contextmenu', handleRightClick);
-      // Cleanup countdown timer
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
     };
   }, [examStarted, securityWarnings, isReenteringFullscreen, isSubmittingExam]);
 
@@ -617,15 +627,14 @@ export default function ExamPage() {
               </p>
               
               <div className="bg-red-800/50 backdrop-blur-sm border border-red-600/50 rounded-2xl p-6 mb-6">
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-red-200 mb-3 animate-pulse">{countdown}</div>
-                  <p className="text-red-200 text-sm font-semibold">
-                    Exam will auto-submit in {countdown} seconds!
-                  </p>
-                  <p className="text-red-300 text-xs mt-2">
-                    Return to fullscreen mode to cancel auto-submission
-                  </p>
-                </div>
+                <CountdownTimer
+                  initialSeconds={8}
+                  isActive={isCountingDown}
+                  onComplete={handleCountdownComplete}
+                  onReset={handleCountdownReset}
+                  debug={true}
+                  className=""
+                />
               </div>
               
               {!isFullscreen && (
