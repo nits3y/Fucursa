@@ -30,6 +30,8 @@ export default function ExamPage() {
   const [isSubmittingExam, setIsSubmittingExam] = useState(false);
   const [questionTimeSpent, setQuestionTimeSpent] = useState<{ [key: string]: number }>({});
   const [redirectCountdown, setRedirectCountdown] = useState(10);
+  const [showExpiredModal, setShowExpiredModal] = useState(false);
+  const [expiryMessage, setExpiryMessage] = useState('');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const securityCheckRef = useRef<NodeJS.Timeout | null>(null);
@@ -93,6 +95,26 @@ export default function ExamPage() {
         alert('This exam is not currently active. Please contact your teacher.');
         window.location.href = '/';
         return;
+      }
+
+      // Check if exam has ended (deadline passed)
+      if (exam.endDate) {
+        const now = new Date();
+        const deadline = new Date(exam.endDate);
+        if (now > deadline) {
+          const deadlineFormatted = deadline.toLocaleString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          });
+          setExpiryMessage(`The deadline for "${exam.title}" was ${deadlineFormatted}. Unfortunately, the exam is no longer accepting responses.`);
+          setShowExpiredModal(true);
+          setLoading(false);
+          return;
+        }
       }
 
       setExamData(exam);
@@ -474,6 +496,55 @@ export default function ExamPage() {
     }
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Show expired modal if exam has ended
+  if (showExpiredModal) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        {/* Exam Expired Modal */}
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="relative bg-gradient-to-br from-slate-900/95 via-orange-900/30 to-slate-900/95 backdrop-blur-xl rounded-3xl shadow-[0_0_80px_rgba(251,146,60,0.4)] w-full max-w-lg border-2 border-orange-500/40 animate-in fade-in duration-500">
+            {/* Glow effects */}
+            <div className="absolute top-0 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent"></div>
+            <div className="absolute bottom-0 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+            
+            <div className="p-8 text-center">
+              {/* Icon */}
+              <div className="mx-auto w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-orange-500/50 animate-pulse">
+                <Clock className="h-10 w-10 text-white" />
+              </div>
+              
+              {/* Title */}
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-4">
+                Exam Has Ended
+              </h2>
+              
+              {/* Message */}
+              <div className="mb-6">
+                <p className="text-gray-300 text-base leading-relaxed mb-4">
+                  {expiryMessage}
+                </p>
+                <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 backdrop-blur-sm">
+                  <p className="text-sm text-orange-300">
+                    📌 <strong>Note:</strong> If you believe this is an error, please contact your teacher for assistance.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Button */}
+              <button
+                onClick={() => window.location.href = '/'}
+                className="group relative overflow-hidden px-8 py-3 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 hover:from-orange-500 hover:via-red-500 hover:to-orange-500 text-white rounded-xl font-bold shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 text-base"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span className="relative z-10">Return to Home</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !studentInfo || !examData) {
     return (

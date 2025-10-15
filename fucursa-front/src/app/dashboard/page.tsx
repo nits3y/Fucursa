@@ -429,6 +429,8 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
   const [description, setDescription] = useState('');
   const [timePerQuestion, setTimePerQuestion] = useState(60);
   const [instructions, setInstructions] = useState('');
+  const [deadlineDate, setDeadlineDate] = useState('');
+  const [deadlineTime, setDeadlineTime] = useState('');
   const [requireEdpCode, setRequireEdpCode] = useState(false);
   const [edpCodes, setEdpCodes] = useState<string[]>([]);
   const [newEdpCode, setNewEdpCode] = useState('');
@@ -466,6 +468,12 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
         return;
       }
 
+      // Combine date and time if both are provided
+      let endDate = undefined;
+      if (deadlineDate && deadlineTime) {
+        endDate = `${deadlineDate}T${deadlineTime}`;
+      }
+
       const examData = {
         title,
         description,
@@ -475,6 +483,7 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
         timePerQuestion,
         timingMode: 'per-question' as const,
         instructions: instructions || undefined,
+        endDate: endDate || undefined,
         requireEdpCode,
         edpCodes: requireEdpCode ? edpCodes : []
       };
@@ -620,6 +629,38 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
               />
                   <p className="mt-1 text-[10px] text-gray-400">
                     ⏱️ Time allowed for each question (in seconds)
+                  </p>
+                </div>
+
+                {/* Deadline Section */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Exam Deadline (Optional)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={deadlineDate}
+                        onChange={(e) => setDeadlineDate(e.target.value)}
+                        className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Time</label>
+                      <input
+                        type="time"
+                        value={deadlineTime}
+                        onChange={(e) => setDeadlineTime(e.target.value)}
+                        className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-1 text-[10px] text-gray-400">
+                    📅 Exam will automatically close and stop accepting responses after this date/time
                   </p>
                 </div>
 

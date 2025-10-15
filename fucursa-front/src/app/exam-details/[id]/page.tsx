@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Eye, Users, Clock, Calendar, BookOpen, AlertCircle, Edit, Hash } from 'lucide-react';
+import { ArrowLeft, Eye, Users, Clock, Calendar, BookOpen, AlertCircle, Edit, Hash, ChevronDown, ChevronUp } from 'lucide-react';
 import { examApi, questionApi, studentResponseApi, apiUtils } from '@/lib/api';
 import { Exam, Question, StudentResponse } from '@/types/database';
 import QuestionManager from '@/components/QuestionManager';
@@ -22,10 +22,22 @@ export default function ExamDetailsPage() {
   const [sortBy, setSortBy] = useState<'name-asc' | 'name-desc' | 'score-high' | 'score-low'>('name-asc');
   const [edpFilter, setEdpFilter] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'questions' | 'responses'>('questions');
+  const [expandedResponses, setExpandedResponses] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadExamDetails();
   }, [examId]);
+
+  // Toggle expanded state for a response
+  const toggleResponse = (responseId: string) => {
+    const newExpanded = new Set(expandedResponses);
+    if (newExpanded.has(responseId)) {
+      newExpanded.delete(responseId);
+    } else {
+      newExpanded.add(responseId);
+    }
+    setExpandedResponses(newExpanded);
+  };
 
   // Get unique EDP codes from exam settings and responses
   const getUniqueEdpCodes = () => {
@@ -269,6 +281,20 @@ export default function ExamDetailsPage() {
             </div>
           </div>
 
+          {exam.endDate && (
+            <div className="mt-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg p-3">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="h-4 w-4 text-orange-400" />
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-orange-300">Exam Deadline</p>
+                  <p className="text-xs text-gray-300">
+                    {new Date(exam.endDate).toLocaleString()} - Exam will automatically close after this time
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {exam.instructions && (
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 mt-3">
               <h3 className="text-white font-semibold text-sm mb-1">Instructions</h3>
@@ -411,44 +437,107 @@ export default function ExamDetailsPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {getSortedResponses().map((response) => (
-                <div key={response.id} className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-white">{response.studentName}</h4>
-                      {response.edpCode && (
-                        <p className="text-blue-300 text-xs font-mono mt-0.5">EDP: {response.edpCode}</p>
-                      )}
-                      <p className="text-gray-400 text-xs mt-0.5">{response.studentEmail}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-white">
-                        {response.score || 0}/{response.totalPoints || 0}
+              {getSortedResponses().map((response) => {
+                const isExpanded = expandedResponses.has(response.id);
+                return (
+                  <div key={response.id} className="bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 overflow-hidden transition-all duration-300 hover:bg-white/10">
+                    {/* Header - Clickable */}
+                    <div 
+                      onClick={() => toggleResponse(response.id)}
+                      className="p-3 cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1">
+                          {/* Expand/Collapse Icon */}
+                          <div className="text-gray-400">
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </div>
+                          
+                          {/* Student Info */}
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="text-sm font-semibold text-white">{response.studentName}</h4>
+                              <span className="text-lg font-bold text-green-400">
+                                {response.score || 0}<span className="text-xs text-gray-400">/{response.totalPoints || 0}</span>
+                              </span>
+                            </div>
+                            {response.edpCode && (
+                              <p className="text-blue-300 text-xs font-mono mt-0.5">EDP: {response.edpCode}</p>
+                            )}
+                          </div>
+                          
+                          {/* Time and Date */}
+                          <div className="flex items-center space-x-4 text-xs text-gray-400">
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{Math.floor(response.timeSpent / 60)}m {response.timeSpent % 60}s</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>{new Date(response.submittedAt).toLocaleDateString()}</span>
+                            </div>
+                            {response.isAutoSubmitted && (
+                              <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">Auto</span>
+                            )}
+                            {response.securityWarnings > 0 && (
+                              <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded">{response.securityWarnings} ⚠</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-400">
-                        points
+                    </div>
+                    
+                    {/* Expandable Answers Section */}
+                    {isExpanded && (
+                      <div className="px-3 pb-3 pt-0 border-t border-white/10">
+                        <div className="mt-3 space-y-3">
+                          {questions.map((question, index) => {
+                            const studentAnswer = response.answers[question.id];
+                            const isCorrect = question.correctAnswer && studentAnswer?.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
+                            
+                            return (
+                              <div key={question.id} className="bg-white/5 rounded-lg p-3 border border-white/10">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex-1">
+                                    <div className="flex items-center space-x-2 mb-1">
+                                      <span className="text-xs font-bold text-blue-400">Q{index + 1}</span>
+                                      <span className="text-xs text-gray-400">{question.type.replace('-', ' ')}</span>
+                                    </div>
+                                    <p className="text-sm text-white font-medium">{question.question}</p>
+                                  </div>
+                                  <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                                    question.type === 'essay' ? 'bg-gray-500/20 text-gray-300' :
+                                    isCorrect ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                                  }`}>
+                                    {question.type === 'essay' ? 'Manual' : isCorrect ? '✓ Correct' : '✗ Wrong'}
+                                  </span>
+                                </div>
+                                
+                                <div className="mt-2 space-y-1">
+                                  <div className="flex items-start space-x-2">
+                                    <span className="text-xs text-gray-400 min-w-[80px]">Student Answer:</span>
+                                    <span className="text-xs text-white flex-1">{studentAnswer || <span className="text-gray-500 italic">No answer</span>}</span>
+                                  </div>
+                                  {question.correctAnswer && question.type !== 'essay' && (
+                                    <div className="flex items-start space-x-2">
+                                      <span className="text-xs text-gray-400 min-w-[80px]">Correct Answer:</span>
+                                      <span className="text-xs text-green-400 flex-1">{question.correctAnswer}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 text-xs text-gray-400">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-3 w-3" />
-                      <span>{Math.floor(response.timeSpent / 60)}m {response.timeSpent % 60}s</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>{new Date(response.submittedAt).toLocaleDateString()}</span>
-                    </div>
-                    {response.isAutoSubmitted && (
-                      <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">Auto</span>
-                    )}
-                    {response.securityWarnings > 0 && (
-                      <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded">{response.securityWarnings} ⚠</span>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

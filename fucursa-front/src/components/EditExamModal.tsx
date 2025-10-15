@@ -20,6 +20,15 @@ export default function EditExamModal({ exam, onClose, onSuccess }: EditExamModa
   const [timePerQuestion, setTimePerQuestion] = useState(exam.timePerQuestion || 60);
   const [status, setStatus] = useState(exam.status);
   const [instructions, setInstructions] = useState(exam.instructions || '');
+  
+  // Split existing endDate into date and time
+  const [deadlineDate, setDeadlineDate] = useState(
+    exam.endDate ? exam.endDate.slice(0, 10) : ''
+  );
+  const [deadlineTime, setDeadlineTime] = useState(
+    exam.endDate ? exam.endDate.slice(11, 16) : ''
+  );
+  
   const [requireEdpCode, setRequireEdpCode] = useState(exam.requireEdpCode || false);
   const [edpCodes, setEdpCodes] = useState<string[]>(exam.edpCodes || []);
   const [newEdpCode, setNewEdpCode] = useState('');
@@ -53,6 +62,12 @@ export default function EditExamModal({ exam, onClose, onSuccess }: EditExamModa
     setError('');
 
     try {
+      // Combine date and time if both are provided
+      let endDate = undefined;
+      if (deadlineDate && deadlineTime) {
+        endDate = `${deadlineDate}T${deadlineTime}`;
+      }
+
       const updateData = {
         title,
         description,
@@ -62,6 +77,7 @@ export default function EditExamModal({ exam, onClose, onSuccess }: EditExamModa
         timingMode: 'per-question' as const,
         status,
         instructions: instructions || undefined,
+        endDate: endDate || undefined,
         requireEdpCode,
         edpCodes: requireEdpCode ? edpCodes : []
       };
@@ -241,6 +257,38 @@ export default function EditExamModal({ exam, onClose, onSuccess }: EditExamModa
 
             {activeTab === 'settings' && (
               <div className="space-y-4 h-full">
+                {/* Exam Deadline Section */}
+                <div className="border border-orange-500/20 rounded-xl p-4 bg-orange-500/5">
+                  <label className="block text-xs font-medium text-gray-300 mb-2">
+                    Exam Deadline (Optional)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={deadlineDate}
+                        onChange={(e) => setDeadlineDate(e.target.value)}
+                        className="w-full px-3 py-2 text-sm bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 text-white transition-all duration-300"
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Time</label>
+                      <input
+                        type="time"
+                        value={deadlineTime}
+                        onChange={(e) => setDeadlineTime(e.target.value)}
+                        className="w-full px-3 py-2 text-sm bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 text-white transition-all duration-300"
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-2 text-[10px] text-gray-400">
+                    📅 Exam will automatically close and stop accepting responses after this date/time
+                  </p>
+                </div>
+
                 {/* EDP Code Section */}
                 <div className="border border-purple-500/20 rounded-xl p-4 bg-purple-500/5">
                   <div className="flex items-center justify-between mb-3">

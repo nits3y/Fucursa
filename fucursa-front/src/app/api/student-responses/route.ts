@@ -57,6 +57,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 404 });
     }
 
+    // Check if exam has ended (deadline passed)
+    if (exam.endDate) {
+      const now = new Date();
+      const deadline = new Date(exam.endDate);
+      if (now > deadline) {
+        const response: ApiResponse<null> = {
+          success: false,
+          error: 'This exam has ended. The deadline has passed and it no longer accepts responses.'
+        };
+        return NextResponse.json(response, { status: 403 }); // 403 Forbidden
+      }
+    }
+
     // Check if student has already submitted a response for this exam
     const existingResponses = await Database.getResponsesByExam(examId);
     const studentIdentifier = studentInfo.email?.toLowerCase() || studentInfo.fullName?.toLowerCase();
