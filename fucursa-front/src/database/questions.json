@@ -1037,6 +1037,78 @@
       "isRequired": true,
       "createdAt": "2025-10-15T07:00:49.026Z",
       "updatedAt": "2025-10-15T07:00:49.026Z"
+    },
+    {
+      "id": "question_1760513717875_e1jscx600",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "question": "1 + 1",
+      "type": "multiple-choice",
+      "options": [
+        "2",
+        "4",
+        "51",
+        "3"
+      ],
+      "correctAnswer": "2",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T07:35:17.875Z",
+      "updatedAt": "2025-10-15T07:35:17.875Z"
+    },
+    {
+      "id": "question_1760513742320_wypsb238o",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "question": "2 + 2?",
+      "type": "multiple-choice",
+      "options": [
+        "4",
+        "8",
+        "1",
+        "2"
+      ],
+      "correctAnswer": "4",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T07:35:42.320Z",
+      "updatedAt": "2025-10-15T07:35:42.320Z"
+    },
+    {
+      "id": "question_1760513762201_euq97cik3",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "question": "5 + 5 is 10",
+      "type": "true-false",
+      "correctAnswer": "True",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T07:36:02.201Z",
+      "updatedAt": "2025-10-15T07:36:02.201Z"
+    },
+    {
+      "id": "question_1760513779517_mz6yyhikk",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "question": "0 + 1 is ?",
+      "type": "identification",
+      "correctAnswer": "1",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T07:36:19.517Z",
+      "updatedAt": "2025-10-15T07:36:19.517Z"
+    },
+    {
+      "id": "question_1760513798903_o3slk0mzz",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "question": "1 + 2 is ?",
+      "type": "identification",
+      "correctAnswer": "3",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T07:36:38.903Z",
+      "updatedAt": "2025-10-15T07:36:38.903Z"
     }
   ]
 }

@@ -39,7 +39,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { name, email, department } = body;
+    const { name, email, department, currentPassword, newPassword } = body;
 
     // Check if teacher exists
     const existingTeacher = await Database.getTeacherById(params.id);
@@ -51,6 +51,31 @@ export async function PUT(
       return NextResponse.json(response, { status: 404 });
     }
 
+    // Handle password change
+    if (currentPassword && newPassword) {
+      // Verify current password
+      if (existingTeacher.password !== currentPassword) {
+        const response: ApiResponse<null> = {
+          success: false,
+          error: 'Current password is incorrect'
+        };
+        return NextResponse.json(response, { status: 401 });
+      }
+
+      // Update password
+      const updatedTeacher = await Database.updateTeacher(params.id, {
+        password: newPassword
+      });
+
+      const response: ApiResponse<Teacher> = {
+        success: true,
+        data: updatedTeacher,
+        message: 'Password updated successfully'
+      };
+      return NextResponse.json(response);
+    }
+
+    // Handle other profile updates
     // Check if email is being changed and if it's already taken
     if (email && email !== existingTeacher.email) {
       const emailExists = await Database.getTeacherByEmail(email);

@@ -4,7 +4,7 @@
       "id": "exam_1760511104336_04k3ljqm5",
       "title": "IT IC 11",
       "description": "IT IC 11",
-      "teacherId": "teacher_1704067200000_abc123def",
+      "teacherId": "teacher_1704067200000_prado123",
       "timeLimit": 1,
       "timeLimitSeconds": 25,
       "timePerQuestion": 25,
@@ -18,6 +18,21 @@
       "status": "active",
       "createdAt": "2025-10-15T06:51:44.336Z",
       "updatedAt": "2025-10-15T07:01:42.560Z"
+    },
+    {
+      "id": "exam_1760513665893_a0a13utoi",
+      "title": "For testing Exam",
+      "description": "Just for development phase\n",
+      "teacherId": "teacher_1704067200000_prado123",
+      "timeLimit": 1,
+      "timeLimitSeconds": 15,
+      "timePerQuestion": 15,
+      "timingMode": "per-question",
+      "requireEdpCode": false,
+      "edpCodes": [],
+      "status": "active",
+      "createdAt": "2025-10-15T07:34:25.893Z",
+      "updatedAt": "2025-10-15T07:37:43.008Z"
     }
   ]
 }

@@ -29,14 +29,45 @@ export default function ExamPage() {
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [isSubmittingExam, setIsSubmittingExam] = useState(false);
   const [questionTimeSpent, setQuestionTimeSpent] = useState<{ [key: string]: number }>({});
+  const [redirectCountdown, setRedirectCountdown] = useState(10);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const securityCheckRef = useRef<NodeJS.Timeout | null>(null);
+  const redirectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load exam data
   useEffect(() => {
     loadExamData();
   }, [examId]);
+
+  // Auto-redirect countdown after exam submission
+  useEffect(() => {
+    if (isExamSubmitted) {
+      // Start countdown from 10 seconds
+      setRedirectCountdown(10);
+      
+      redirectTimerRef.current = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev <= 1) {
+            // Redirect to home page
+            if (redirectTimerRef.current) {
+              clearInterval(redirectTimerRef.current);
+            }
+            window.location.href = '/';
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Cleanup interval on unmount
+      return () => {
+        if (redirectTimerRef.current) {
+          clearInterval(redirectTimerRef.current);
+        }
+      };
+    }
+  }, [isExamSubmitted]);
 
   const loadExamData = async () => {
     try {
@@ -472,6 +503,15 @@ export default function ExamPage() {
           <p className="text-gray-300 mb-6 leading-relaxed">
             Your exam has been successfully submitted. You can now close this window.
           </p>
+          
+          {/* Auto-redirect countdown */}
+          <div className="bg-blue-500/20 backdrop-blur-sm rounded-xl p-4 mb-6 border border-blue-500/30">
+            <p className="text-blue-200 text-sm mb-2">Redirecting to home page in</p>
+            <div className="text-4xl font-bold text-blue-400">
+              {redirectCountdown}s
+            </div>
+          </div>
+
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 text-sm border border-white/10">
             <div className="space-y-2 text-gray-300">
               <p><span className="text-gray-400">Student:</span> <span className="text-white font-medium">{studentInfo.fullName}</span></p>
@@ -700,15 +740,7 @@ export default function ExamPage() {
           </div>
 
           {/* Modern Navigation */}
-          <div className="flex items-center justify-center space-x-8">
-            <button
-              onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-              disabled={currentQuestion === 0}
-              className="group px-10 py-4 bg-white/10 backdrop-blur-md hover:bg-white/20 disabled:bg-white/5 disabled:text-gray-500 disabled:cursor-not-allowed rounded-2xl transition-all duration-300 border border-white/20 hover:border-white/40 transform hover:-translate-y-1 disabled:transform-none font-semibold text-lg shadow-lg hover:shadow-xl"
-            >
-              ← Previous
-            </button>
-
+          <div className="flex items-center justify-center">
             {currentQuestion === questions.length - 1 ? (
               <button
                 onClick={() => handleSubmitExam(false)}
@@ -720,10 +752,16 @@ export default function ExamPage() {
             ) : (
               <button
                 onClick={() => setCurrentQuestion(Math.min(questions.length - 1, currentQuestion + 1))}
-                className="group relative overflow-hidden px-10 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-500 hover:via-blue-400 hover:to-blue-500 text-white rounded-2xl font-bold shadow-2xl hover:shadow-blue-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
+                className={`group relative overflow-hidden px-10 py-4 rounded-2xl font-bold shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-lg ${
+                  answers[currentQ.id] && answers[currentQ.id].trim() !== ''
+                    ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-500 hover:via-blue-400 hover:to-blue-500 hover:shadow-blue-500/30 text-white'
+                    : 'bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 hover:from-gray-500 hover:via-gray-400 hover:to-gray-500 hover:shadow-gray-500/30 text-white/90'
+                }`}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span className="relative z-10">Next →</span>
+                <span className="relative z-10">
+                  {answers[currentQ.id] && answers[currentQ.id].trim() !== '' ? 'Next →' : 'Skip →'}
+                </span>
               </button>
             )}
           </div>

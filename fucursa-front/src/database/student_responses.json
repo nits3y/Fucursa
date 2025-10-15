@@ -466,6 +466,117 @@
       "status": "submitted",
       "submittedAt": "2025-10-15T07:03:51.000Z",
       "createdAt": "2025-10-15T07:03:51.000Z"
+    },
+    {
+      "id": "response_1760512694968_7uhsdfyzx",
+      "examId": "exam_1760511104336_04k3ljqm5",
+      "studentId": "student_1760512694960",
+      "studentName": "Cababan, Vince",
+      "studentEmail": "",
+      "edpCode": "2511550",
+      "answers": {
+        "question_1760511492646_ef4qt5fc5": "True",
+        "question_1760511532182_wxcu4n0fm": "True",
+        "question_1760511508193_u2zwa6wex": "False",
+        "question_1760511504844_evso0ulvg": "True",
+        "question_1760511496838_atetyye9l": "sadfasdf",
+        "question_1760511499895_93o0vyhv3": "Fourth Generation"
+      },
+      "score": 2,
+      "totalPoints": 50,
+      "percentage": 4,
+      "timeSpent": 35,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-15T07:18:14.968Z",
+      "createdAt": "2025-10-15T07:18:14.969Z"
+    },
+    {
+      "id": "response_1760513910142_a3tcfpnsn",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "studentId": "student_1760513910142",
+      "studentName": "Prado, Yestin Roy A.",
+      "studentEmail": "",
+      "answers": {
+        "question_1760513798903_o3slk0mzz": "3",
+        "question_1760513762201_euq97cik3": "True",
+        "question_1760513717875_e1jscx600": "2",
+        "question_1760513779517_mz6yyhikk": "1",
+        "question_1760513742320_wypsb238o": "4"
+      },
+      "score": 5,
+      "totalPoints": 5,
+      "percentage": 100,
+      "timeSpent": 47,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-15T07:38:30.142Z",
+      "createdAt": "2025-10-15T07:38:30.142Z"
+    },
+    {
+      "id": "response_1760514121571_44b2qtv7k",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "studentId": "student_1760514121571",
+      "studentName": "Cababan, Vince",
+      "studentEmail": "",
+      "answers": {
+        "question_1760513762201_euq97cik3": "True",
+        "question_1760513742320_wypsb238o": "4",
+        "question_1760513798903_o3slk0mzz": "3",
+        "question_1760513717875_e1jscx600": "2",
+        "question_1760513779517_mz6yyhikk": "1"
+      },
+      "score": 5,
+      "totalPoints": 5,
+      "percentage": 100,
+      "timeSpent": 46,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-15T07:42:01.571Z",
+      "createdAt": "2025-10-15T07:42:01.571Z"
+    },
+    {
+      "id": "response_1760514373735_uqurgvuc7",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "studentId": "student_1760514373735",
+      "studentName": "Arojado, Sergie",
+      "studentEmail": "",
+      "answers": {
+        "question_1760513798903_o3slk0mzz": "3",
+        "question_1760513717875_e1jscx600": "2",
+        "question_1760513779517_mz6yyhikk": "1",
+        "question_1760513742320_wypsb238o": "4",
+        "question_1760513762201_euq97cik3": "True"
+      },
+      "score": 5,
+      "totalPoints": 5,
+      "percentage": 100,
+      "timeSpent": 51,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-15T07:46:13.735Z",
+      "createdAt": "2025-10-15T07:46:13.735Z"
+    },
+    {
+      "id": "response_1760514403590_bxeify2sp",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "studentId": "student_1760514403589",
+      "studentName": "Test, User 1",
+      "studentEmail": "",
+      "answers": {},
+      "score": 0,
+      "totalPoints": 5,
+      "percentage": 0,
+      "timeSpent": 45,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-15T07:46:43.591Z",
+      "createdAt": "2025-10-15T07:46:43.591Z"
     }
   ]
 }

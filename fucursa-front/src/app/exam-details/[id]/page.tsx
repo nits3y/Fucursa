@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Eye, Users, Clock, Calendar, BookOpen, AlertCircle, Edit } from 'lucide-react';
+import { ArrowLeft, Eye, Users, Clock, Calendar, BookOpen, AlertCircle, Edit, Hash } from 'lucide-react';
 import { examApi, questionApi, studentResponseApi, apiUtils } from '@/lib/api';
 import { Exam, Question, StudentResponse } from '@/types/database';
 import QuestionManager from '@/components/QuestionManager';
@@ -246,6 +246,13 @@ export default function ExamDetailsPage() {
             </div>
           </div>
           <p className="text-gray-300 text-sm mb-3">{exam.description}</p>
+          
+          {/* Exam ID Display */}
+          <div className="mb-3 flex items-center space-x-2 p-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+            <Hash className="h-4 w-4 text-cyan-400" />
+            <span className="text-xs text-gray-400">Exam ID:</span>
+            <code className="text-xs font-mono text-cyan-300 bg-black/20 px-2 py-1 rounded">{exam.id}</code>
+          </div>
           
           <div className="grid grid-cols-3 gap-3 text-sm">
             <div className="flex items-center space-x-2">

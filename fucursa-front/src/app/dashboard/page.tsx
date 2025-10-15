@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BookOpen, Plus, Eye, Edit, Trash2, Users, Clock, Calendar, Settings, LogOut, X } from 'lucide-react';
+import { BookOpen, Plus, Eye, Edit, Trash2, Users, Clock, Calendar, Settings, LogOut, X, User } from 'lucide-react';
 import { examApi, statsApi, apiUtils } from '@/lib/api';
 import { Exam, ExamStats } from '@/types/database';
 import EditExamModal from '@/components/EditExamModal';
 import ConfirmModal from '@/components/ConfirmModal';
+import TeacherSettingsModal from '@/components/TeacherSettingsModal';
 import { useToast } from '@/components/Toast';
 
 export default function Dashboard() {
@@ -18,6 +19,9 @@ export default function Dashboard() {
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [examToDelete, setExamToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [teacherName, setTeacherName] = useState('Teacher');
+  const [avatarColor, setAvatarColor] = useState('');
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -33,9 +37,25 @@ export default function Dashboard() {
     );
   };
 
+  // Generate random avatar color
+  const generateAvatarColor = () => {
+    const colors = [
+      'from-blue-500 to-cyan-500',
+      'from-purple-500 to-pink-500',
+      'from-green-500 to-teal-500',
+      'from-orange-500 to-red-500',
+      'from-indigo-500 to-purple-500',
+      'from-pink-500 to-rose-500',
+      'from-teal-500 to-emerald-500',
+      'from-violet-500 to-fuchsia-500',
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   // Load data on component mount
   useEffect(() => {
     loadDashboardData();
+    setAvatarColor(generateAvatarColor());
   }, []);
 
   const loadDashboardData = async () => {
@@ -49,6 +69,17 @@ export default function Dashboard() {
         toast.error('Please log in first');
         window.location.href = '/';
         return;
+      }
+
+      // Get teacher info from localStorage
+      const teacherInfo = localStorage.getItem('teacherInfo');
+      if (teacherInfo) {
+        try {
+          const parsedInfo = JSON.parse(teacherInfo);
+          setTeacherName(parsedInfo.name || 'Teacher');
+        } catch (e) {
+          console.error('Failed to parse teacher info:', e);
+        }
       }
       
       // Load exams for this teacher only
@@ -156,18 +187,22 @@ export default function Dashboard() {
                   Fucursa
                 </h1>
               </div>
-              <div className="hidden md:block">
-                <span className="text-gray-300 text-sm">Teacher Dashboard</span>
-              </div>
+           
             </div>
             
-            <div className="flex items-center space-x-2">
-              <button className="p-1.5 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
+            {/* Settings & Logout */}
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setShowSettingsModal(true)}
+                className="p-1.5 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+                title="Settings"
+              >
                 <Settings className="h-4 w-4" />
               </button>
               <button 
                 onClick={handleLogout}
                 className="flex items-center space-x-1.5 text-gray-300 hover:text-white hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition-all duration-300"
+                title="Logout"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden md:inline text-sm">Logout</span>
@@ -178,8 +213,23 @@ export default function Dashboard() {
       </header>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* Welcome Section with Teacher Profile */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center shadow-lg ring-2 ring-white/20`}>
+              <span className="text-white font-bold text-lg">
+                {teacherName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Welcome back,</p>
+              <h2 className="text-lg font-bold text-white">{teacherName}</h2>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Cards - Compact */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           <div className="group bg-white/10 backdrop-blur-md rounded-xl shadow-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
             <div className="flex items-center">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -212,18 +262,6 @@ export default function Dashboard() {
               <div className="ml-3">
                 <p className="text-xs font-medium text-gray-300">Active Exams</p>
                 <p className="text-xl font-bold text-white">{stats?.activeExams || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="group bg-white/10 backdrop-blur-md rounded-xl shadow-xl p-3 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-2 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Calendar className="h-5 w-5 text-white" />
-              </div>
-              <div className="ml-3">
-                <p className="text-xs font-medium text-gray-300">Avg Score</p>
-                <p className="text-xl font-bold text-white">{stats?.averageScore || 0}%</p>
               </div>
             </div>
           </div>
@@ -358,6 +396,14 @@ export default function Dashboard() {
       )}
 
       {/* Confirm Delete Modal */}
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <TeacherSettingsModal
+          onClose={() => setShowSettingsModal(false)}
+          teacherName={teacherName}
+        />
+      )}
+
       <ConfirmModal
         isOpen={showConfirmDelete}
         onClose={() => {
@@ -437,7 +483,7 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
       
       if (apiUtils.isSuccess(response)) {
         toast.success('Exam created successfully!');
-        onClose();
+      onClose();
         // Refresh the page to show the new exam
         window.location.reload();
       } else {
@@ -514,32 +560,32 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
             {/* Basic Info Tab */}
             {activeTab === 'basic' && (
               <div className="h-full flex flex-col space-y-4">
-                <div>
+            <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1.5">
                     Exam Title *
-                  </label>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm placeholder-gray-400 transition-all duration-300"
                     placeholder="e.g., Mathematics Final Exam"
-                    required
-                  />
-                </div>
+                required
+              />
+            </div>
 
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-gray-300 mb-1.5">
                     Description *
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                     className="w-full h-32 px-4 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm placeholder-gray-400 transition-all duration-300 resize-none"
                     placeholder="Describe the exam content and objectives"
-                    required
-                  />
-                </div>
+                required
+              />
+            </div>
 
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-gray-300 mb-1.5">
@@ -558,20 +604,20 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="h-full flex flex-col space-y-5">
-                <div>
+            <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1.5">
                     Time Per Question *
-                  </label>
-                  <input
-                    type="number"
+              </label>
+              <input
+                type="number"
                     value={timePerQuestion}
                     onChange={(e) => setTimePerQuestion(parseInt(e.target.value) || 0)}
                     min="1"
                     max="3600"
                     className="w-full px-4 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm placeholder-gray-400 transition-all duration-300"
                     placeholder="60"
-                    required
-                  />
+                required
+              />
                   <p className="mt-1 text-[10px] text-gray-400">
                     ⏱️ Time allowed for each question (in seconds)
                   </p>
@@ -645,7 +691,7 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
             )}
-          </div>
+            </div>
 
           {/* Fixed Footer - Always Visible */}
           <div className="flex justify-end space-x-3 px-5 py-4 border-t border-purple-500/20 bg-slate-900/30">
