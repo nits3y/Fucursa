@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: SubmitExamRequest = await request.json();
-    const { examId, studentInfo, answers, timeSpent, isAutoSubmitted, securityWarnings } = body;
+    const { examId, studentInfo, answers, timeSpent, isAutoSubmitted, securityWarnings, edpCode } = body;
 
     // Validate required fields
     if (!examId || !studentInfo || !answers) {
@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
       studentId: studentInfo.studentId || `student_${Date.now()}`,
       studentName: studentInfo.fullName,
       studentEmail: studentInfo.email,
+      edpCode: edpCode || undefined,
       answers,
       score,
       totalPoints,

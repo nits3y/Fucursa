@@ -1,44 +1,23 @@
 {
   "exams": [
     {
-      "id": "exam_1704067200000_xyz789abc",
-      "title": "Mathematics Final Exam",
-      "description": "Comprehensive exam covering algebra, geometry, and calculus topics.",
+      "id": "exam_1760511104336_04k3ljqm5",
+      "title": "IT IC 11",
+      "description": "IT IC 11",
       "teacherId": "teacher_1704067200000_abc123def",
       "timeLimit": 1,
-      "timeLimitSeconds": 20,
-      "timePerQuestion": 20,
+      "timeLimitSeconds": 25,
+      "timePerQuestion": 25,
       "timingMode": "per-question",
+      "requireEdpCode": true,
+      "edpCodes": [
+        "2511550",
+        "2511481",
+        "2510126"
+      ],
       "status": "active",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2025-10-15T04:14:30.497Z",
-      "instructions": "Read each question carefully. You have 120 minutes to complete this exam. Good luck!"
-    },
-    {
-      "id": "exam_1760502030733_3myzvdgiz",
-      "title": "Computer Programmin Quiz 1",
-      "description": "Read and answer it honestly",
-      "teacherId": "teacher_1704067200000_abc123def",
-      "timeLimit": 1,
-      "timeLimitSeconds": 20,
-      "timePerQuestion": 20,
-      "timingMode": "per-question",
-      "status": "active",
-      "createdAt": "2025-10-15T04:20:30.733Z",
-      "updatedAt": "2025-10-15T04:29:08.501Z"
-    },
-    {
-      "id": "exam_1760503220525_en858pqc6",
-      "title": "Introduction to computing 1",
-      "description": "Introduction to computing 1",
-      "teacherId": "teacher_1704067200000_abc123def",
-      "timeLimit": 1,
-      "timeLimitSeconds": 20,
-      "timePerQuestion": 20,
-      "timingMode": "per-question",
-      "status": "active",
-      "createdAt": "2025-10-15T04:40:20.525Z",
-      "updatedAt": "2025-10-15T05:03:39.306Z"
+      "createdAt": "2025-10-15T06:51:44.336Z",
+      "updatedAt": "2025-10-15T07:01:42.560Z"
     }
   ]
 }

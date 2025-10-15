@@ -386,13 +386,26 @@ export default function ExamPage() {
 
       const timeSpent = (examData.timeLimit * 60) - timeRemaining;
       
+      // Get EDP code from studentInfo in localStorage
+      let edpCode: string | undefined;
+      try {
+        const storedStudentInfo = localStorage.getItem('studentInfo');
+        if (storedStudentInfo) {
+          const parsedInfo = JSON.parse(storedStudentInfo);
+          edpCode = parsedInfo.edpCode || undefined;
+        }
+      } catch (e) {
+        console.error('Failed to parse student info:', e);
+      }
+      
       const responseData = {
         examId,
-      studentInfo,
-      answers,
+        studentInfo,
+        answers,
         timeSpent,
         isAutoSubmitted: autoSubmit,
-        securityWarnings
+        securityWarnings,
+        edpCode
       };
 
       const response = await studentResponseApi.submit(responseData);

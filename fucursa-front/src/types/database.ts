@@ -53,6 +53,7 @@ export interface StudentResponse {
   studentId: string;
   studentName: string;
   studentEmail: string;
+  edpCode?: string; // EDP code used by the student
   answers: {
     [questionId: string]: string;
   };
@@ -101,6 +102,8 @@ export interface CreateExamRequest {
   startDate?: string;
   endDate?: string;
   maxAttempts?: number;
+  requireEdpCode?: boolean;
+  edpCodes?: string[];
 }
 
 // Create question request interface
@@ -124,6 +127,7 @@ export interface SubmitExamRequest {
   timeSpent: number;
   isAutoSubmitted: boolean;
   securityWarnings: number;
+  edpCode?: string; // EDP code used by the student
 }
 
 // Exam statistics interface

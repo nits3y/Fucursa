@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateExamRequest & { teacherId: string } = await request.json();
-    const { title, description, teacherId, timeLimit, timeLimitSeconds, timePerQuestion, timingMode, instructions, startDate, endDate, maxAttempts } = body;
+    const { title, description, teacherId, timeLimit, timeLimitSeconds, timePerQuestion, timingMode, instructions, startDate, endDate, maxAttempts, requireEdpCode, edpCodes } = body;
 
     // Validate required fields
     if (!title || !description || !teacherId) {
@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
       startDate,
       endDate,
       maxAttempts,
+      requireEdpCode,
+      edpCodes,
       status: 'draft'
     });
 

@@ -6,8 +6,10 @@ import { ArrowLeft, Eye, Users, Clock, Calendar, BookOpen, AlertCircle, Edit } f
 import { examApi, questionApi, studentResponseApi, apiUtils } from '@/lib/api';
 import { Exam, Question, StudentResponse } from '@/types/database';
 import QuestionManager from '@/components/QuestionManager';
+import { useToast } from '@/components/Toast';
 
 export default function ExamDetailsPage() {
+  const toast = useToast();
   const params = useParams();
   const examId = params.id as string;
   
@@ -18,34 +20,74 @@ export default function ExamDetailsPage() {
   const [error, setError] = useState('');
   const [showQuestionManager, setShowQuestionManager] = useState(false);
   const [sortBy, setSortBy] = useState<'name-asc' | 'name-desc' | 'score-high' | 'score-low'>('name-asc');
+  const [edpFilter, setEdpFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'questions' | 'responses'>('questions');
 
   useEffect(() => {
     loadExamDetails();
   }, [examId]);
 
-  // Sort responses based on selected sort option
-  const getSortedResponses = () => {
-    const sorted = [...responses];
+  // Get unique EDP codes from exam settings and responses
+  const getUniqueEdpCodes = () => {
+    const allEdpCodes = new Set<string>();
     
+    // Add EDP codes from exam settings
+    if (exam?.edpCodes && exam.edpCodes.length > 0) {
+      exam.edpCodes.forEach(code => allEdpCodes.add(code));
+    }
+    
+    // Add EDP codes from student responses
+    responses.forEach(r => {
+      if (r.edpCode) {
+        allEdpCodes.add(r.edpCode);
+      }
+    });
+    
+    // Convert to array and sort
+    return Array.from(allEdpCodes).sort((a, b) => {
+      // Sort numerically if both are numbers
+      if (!isNaN(Number(a)) && !isNaN(Number(b))) {
+        return Number(a) - Number(b);
+      }
+      return a.localeCompare(b);
+    });
+  };
+
+  // Filter and sort responses
+  const getSortedResponses = () => {
+    let filtered = [...responses];
+    
+    // First, apply EDP code filter
+    if (edpFilter !== 'all') {
+      if (edpFilter === 'none') {
+        // Show only students without EDP code
+        filtered = filtered.filter(r => !r.edpCode);
+      } else {
+        // Show only students with specific EDP code
+        filtered = filtered.filter(r => r.edpCode === edpFilter);
+      }
+    }
+    
+    // Then, apply name/score sorting
     switch (sortBy) {
       case 'name-asc':
-        return sorted.sort((a, b) => 
+        return filtered.sort((a, b) => 
           (a.studentName || '').localeCompare(b.studentName || '')
         );
       case 'name-desc':
-        return sorted.sort((a, b) => 
+        return filtered.sort((a, b) => 
           (b.studentName || '').localeCompare(a.studentName || '')
         );
       case 'score-high':
-        return sorted.sort((a, b) => 
+        return filtered.sort((a, b) => 
           (b.score || 0) - (a.score || 0)
         );
       case 'score-low':
-        return sorted.sort((a, b) => 
+        return filtered.sort((a, b) => 
           (a.score || 0) - (b.score || 0)
         );
       default:
-        return sorted;
+        return filtered;
     }
   };
 
@@ -56,7 +98,7 @@ export default function ExamDetailsPage() {
       // Check if teacher is logged in
       const teacherId = localStorage.getItem('teacherId');
       if (!teacherId) {
-        alert('Please log in first');
+        toast.error('Please log in first');
         window.location.href = '/';
         return;
       }
@@ -228,8 +270,40 @@ export default function ExamDetailsPage() {
           )}
         </div>
 
-        {/* Questions Section - Compact */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-xl border border-white/20 p-4 mb-4">
+        {/* Tabs */}
+        <div className="bg-white/10 backdrop-blur-md rounded-t-xl border-b-0 border border-white/20 flex">
+          <button
+            onClick={() => setActiveTab('questions')}
+            className={`flex-1 py-3 px-6 text-sm font-semibold transition-all duration-300 ${
+              activeTab === 'questions'
+                ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 text-white border-b-2 border-blue-400'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <BookOpen className="h-4 w-4" />
+              <span>Questions ({questions.length})</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('responses')}
+            className={`flex-1 py-3 px-6 text-sm font-semibold transition-all duration-300 ${
+              activeTab === 'responses'
+                ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 text-white border-b-2 border-blue-400'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span>Student Responses ({responses.length})</span>
+            </div>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'questions' ? (
+          /* Questions Section - Compact */
+          <div className="bg-white/10 backdrop-blur-md rounded-b-xl rounded-t-none shadow-xl border border-white/20 p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-bold text-white">Questions ({questions.length})</h3>
             <button
@@ -268,26 +342,57 @@ export default function ExamDetailsPage() {
             </div>
           )}
         </div>
-
-        {/* Student Responses Section - Compact */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl shadow-xl border border-white/20 p-4">
+        ) : (
+          /* Student Responses Section - Compact */
+          <div className="bg-white/10 backdrop-blur-md rounded-b-xl rounded-t-none shadow-xl border border-white/20 p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-bold text-white">Student Responses ({responses.length})</h3>
+            <h3 className="text-lg font-bold text-white">
+              Student Responses ({getSortedResponses().length}{getSortedResponses().length !== responses.length && ` of ${responses.length}`})
+            </h3>
             
             {responses.length > 0 && (
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-400">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name-asc' | 'name-desc' | 'score-high' | 'score-low')}
-                  className="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-white text-xs focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
-                  style={{ colorScheme: 'dark' }}
-                >
-                  <option value="name-asc" className="bg-gray-800 text-white">Name (A → Z)</option>
-                  <option value="name-desc" className="bg-gray-800 text-white">Name (Z → A)</option>
-                  <option value="score-high" className="bg-gray-800 text-white">Highest Score</option>
-                  <option value="score-low" className="bg-gray-800 text-white">Lowest Score</option>
-                </select>
+              <div className="flex items-center space-x-4">
+                {/* EDP Code Filter */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-400">Filter by EDP:</span>
+                  <select
+                    value={edpFilter}
+                    onChange={(e) => setEdpFilter(e.target.value)}
+                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-white text-xs focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all font-mono"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="all" className="bg-gray-800 text-white">All Students ({responses.length})</option>
+                    {getUniqueEdpCodes().map(code => {
+                      const count = responses.filter(r => r.edpCode === code).length;
+                      return (
+                        <option key={code} value={code} className="bg-gray-800 text-white">
+                          EDP: {code} ({count})
+                        </option>
+                      );
+                    })}
+                    {responses.some(r => !r.edpCode) && (
+                      <option value="none" className="bg-gray-800 text-white">
+                        No EDP Code ({responses.filter(r => !r.edpCode).length})
+                      </option>
+                    )}
+                  </select>
+                </div>
+
+                {/* Name/Score Sort */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-400">Sort by:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'name-asc' | 'name-desc' | 'score-high' | 'score-low')}
+                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-lg text-white text-xs focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <option value="name-asc" className="bg-gray-800 text-white">Name (A → Z)</option>
+                    <option value="name-desc" className="bg-gray-800 text-white">Name (Z → A)</option>
+                    <option value="score-high" className="bg-gray-800 text-white">Highest Score</option>
+                    <option value="score-low" className="bg-gray-800 text-white">Lowest Score</option>
+                  </select>
+                </div>
               </div>
             )}
           </div>
@@ -304,7 +409,10 @@ export default function ExamDetailsPage() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1">
                       <h4 className="text-sm font-semibold text-white">{response.studentName}</h4>
-                      <p className="text-gray-400 text-xs">{response.studentEmail}</p>
+                      {response.edpCode && (
+                        <p className="text-blue-300 text-xs font-mono mt-0.5">EDP: {response.edpCode}</p>
+                      )}
+                      <p className="text-gray-400 text-xs mt-0.5">{response.studentEmail}</p>
                     </div>
                     <div className="text-right">
                       <div className="text-xl font-bold text-white">
@@ -337,6 +445,7 @@ export default function ExamDetailsPage() {
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Question Manager Modal */}

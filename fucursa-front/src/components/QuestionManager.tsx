@@ -11,10 +11,11 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import { X, Plus, Edit, Trash2, Save, GripVertical } from 'lucide-react';
+import { X, Plus, Edit, Trash2, Save, GripVertical, CheckSquare, Square } from 'lucide-react';
 import { questionApi, apiUtils } from '@/lib/api';
 import type { Question } from '@/types/database';
 import { useToast } from '@/components/Toast';
+import ConfirmModal from '@/components/ConfirmModal';
 
 // Question type options
 const QUESTION_TYPES = [
@@ -44,6 +45,14 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
   
   // State for import JSON modal
   const [showImportModal, setShowImportModal] = useState(false);
+  
+  // State for confirm delete modal
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
+  
+  // State for multiple selection
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set());
+  const [showConfirmDeleteMultiple, setShowConfirmDeleteMultiple] = useState(false);
 
   // Load questions for this exam
   useEffect(() => {
@@ -81,11 +90,17 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
   };
 
   // Handle delete question
-  const handleDeleteQuestion = async (questionId: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) return;
+  const handleDeleteQuestion = (questionId: string) => {
+    setQuestionToDelete(questionId);
+    setShowConfirmDelete(true);
+  };
+
+  // Confirm delete question
+  const confirmDeleteQuestion = async () => {
+    if (!questionToDelete) return;
 
     try {
-      const response = await questionApi.delete(questionId);
+      const response = await questionApi.delete(questionToDelete);
       
       if (apiUtils.isSuccess(response)) {
         toast.success('Question deleted successfully!');
@@ -96,6 +111,61 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
     } catch (error) {
       console.error('Failed to delete question:', error);
       toast.error('Failed to delete question');
+    } finally {
+      setQuestionToDelete(null);
+    }
+  };
+
+  // Toggle question selection
+  const toggleQuestionSelection = (questionId: string) => {
+    const newSelected = new Set(selectedQuestions);
+    if (newSelected.has(questionId)) {
+      newSelected.delete(questionId);
+    } else {
+      newSelected.add(questionId);
+    }
+    setSelectedQuestions(newSelected);
+  };
+
+  // Select all questions
+  const selectAllQuestions = () => {
+    if (selectedQuestions.size === questions.length) {
+      setSelectedQuestions(new Set());
+    } else {
+      setSelectedQuestions(new Set(questions.map(q => q.id)));
+    }
+  };
+
+  // Handle delete multiple questions
+  const handleDeleteMultiple = () => {
+    if (selectedQuestions.size === 0) {
+      toast.warning('Please select at least one question to delete');
+      return;
+    }
+    setShowConfirmDeleteMultiple(true);
+  };
+
+  // Confirm delete multiple questions
+  const confirmDeleteMultiple = async () => {
+    try {
+      const deletePromises = Array.from(selectedQuestions).map(id => 
+        questionApi.delete(id)
+      );
+      
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(r => apiUtils.isSuccess(r)).length;
+      
+      if (successCount === selectedQuestions.size) {
+        toast.success(`${successCount} question(s) deleted successfully!`);
+      } else {
+        toast.warning(`${successCount} of ${selectedQuestions.size} question(s) deleted`);
+      }
+      
+      setSelectedQuestions(new Set());
+      loadQuestions();
+    } catch (error) {
+      console.error('Failed to delete questions:', error);
+      toast.error('Failed to delete questions');
     }
   };
 
@@ -135,28 +205,62 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
           )}
 
           {/* Action Buttons - Futuristic */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <button
-              onClick={handleAddQuestion}
-              className="group relative flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] transition-all duration-300 border-2 border-purple-400/30 overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
-              <Plus className="h-4 w-4 relative z-10" />
-              <span className="relative z-10">Add New</span>
-            </button>
+          <div className="space-y-2 mb-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleAddQuestion}
+                className="group relative flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] transition-all duration-300 border-2 border-purple-400/30 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+                <Plus className="h-4 w-4 relative z-10" />
+                <span className="relative z-10">Add New</span>
+              </button>
 
-            <button
-              onClick={() => setShowImportModal(true)}
-              className="group relative flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-600 via-teal-600 to-cyan-600 hover:from-green-500 hover:via-teal-500 hover:to-cyan-500 text-white rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300 border-2 border-green-400/30 overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-cyan-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
-              <svg className="h-4 w-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              <span className="relative z-10">Import JSON</span>
-            </button>
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="group relative flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-600 via-teal-600 to-cyan-600 hover:from-green-500 hover:via-teal-500 hover:to-cyan-500 text-white rounded-xl font-semibold text-sm shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300 border-2 border-green-400/30 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-cyan-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+                <svg className="h-4 w-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span className="relative z-10">Import JSON</span>
+              </button>
+            </div>
+
+            {/* Selection Controls */}
+            {questions.length > 0 && (
+              <div className="flex items-center justify-between p-2 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg">
+                <button
+                  onClick={selectAllQuestions}
+                  className="flex items-center space-x-2 text-xs text-gray-300 hover:text-white transition-colors"
+                >
+                  {selectedQuestions.size === questions.length ? (
+                    <CheckSquare className="h-4 w-4 text-blue-400" />
+                  ) : (
+                    <Square className="h-4 w-4" />
+                  )}
+                  <span>
+                    {selectedQuestions.size === questions.length 
+                      ? 'Deselect All' 
+                      : `Select All (${selectedQuestions.size} selected)`}
+                  </span>
+                </button>
+
+                {selectedQuestions.size > 0 && (
+                  <button
+                    onClick={handleDeleteMultiple}
+                    className="group relative flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-semibold text-xs shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(220,38,38,0.6)] transition-all duration-300 border border-red-400/30 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Trash2 className="h-3.5 w-3.5 relative z-10" />
+                    <span className="relative z-10">Delete Selected ({selectedQuestions.size})</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Questions List - Compact */}
@@ -171,10 +275,25 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
               {questions.map((question, index) => (
                 <div
                   key={question.id}
-                  className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-3 hover:bg-white/10 transition-all duration-300"
+                  className={`bg-white/5 backdrop-blur-sm border rounded-lg p-3 hover:bg-white/10 transition-all duration-300 ${
+                    selectedQuestions.has(question.id) 
+                      ? 'border-blue-500/50 bg-blue-500/10' 
+                      : 'border-white/20'
+                  }`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start space-x-2 flex-1">
+                      {/* Checkbox for selection */}
+                      <button
+                        onClick={() => toggleQuestionSelection(question.id)}
+                        className="flex-shrink-0 mt-0.5"
+                      >
+                        {selectedQuestions.has(question.id) ? (
+                          <CheckSquare className="h-5 w-5 text-blue-400" />
+                        ) : (
+                          <Square className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                        )}
+                      </button>
                       <div className="flex items-center justify-center w-6 h-6 bg-blue-600 rounded text-white font-bold text-xs flex-shrink-0">
                         {index + 1}
                       </div>
@@ -282,6 +401,34 @@ export default function QuestionManager({ examId, onClose }: QuestionManagerProp
           }}
         />
       )}
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={showConfirmDelete}
+        onClose={() => {
+          setShowConfirmDelete(false);
+          setQuestionToDelete(null);
+        }}
+        onConfirm={confirmDeleteQuestion}
+        title="Delete Question"
+        message="Are you sure you want to delete this question? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      <ConfirmModal
+        isOpen={showConfirmDeleteMultiple}
+        onClose={() => setShowConfirmDeleteMultiple(false)}
+        onConfirm={() => {
+          confirmDeleteMultiple();
+          setShowConfirmDeleteMultiple(false);
+        }}
+        title="Delete Multiple Questions"
+        message={`Are you sure you want to delete ${selectedQuestions.size} selected question(s)? This action cannot be undone.`}
+        confirmText="Delete All"
+        cancelText="Cancel"
+        isDangerous={true}
+      />
     </div>
   );
 }

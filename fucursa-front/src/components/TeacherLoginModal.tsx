@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Eye, EyeOff, User, Lock } from 'lucide-react';
+import { X, Eye, EyeOff, User, Lock, GraduationCap, AlertCircle } from 'lucide-react';
 import { teacherApi, apiUtils } from '@/lib/api';
 
 interface TeacherLoginModalProps {
@@ -46,80 +46,147 @@ export default function TeacherLoginModal({ onClose, onLoginSuccess }: TeacherLo
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md border border-white/20">
-        <div className="flex items-center justify-between p-6 border-b border-white/20">
-          <h2 className="text-xl font-bold text-white">Teacher Login</h2>
+    <div 
+      className="fixed inset-0 bg-gradient-to-br from-black/90 via-indigo-900/30 to-black/90 backdrop-blur-md flex items-center justify-center p-2 z-50 animate-in fade-in duration-300"
+      onClick={handleOverlayClick}
+    >
+      <div className="relative bg-gradient-to-br from-slate-900/95 via-indigo-900/20 to-slate-900/95 backdrop-blur-xl rounded-2xl shadow-[0_0_50px_rgba(99,102,241,0.3)] w-full max-w-md max-h-[96vh] border-2 border-indigo-500/30 transform transition-all">
+        {/* Futuristic glow effects */}
+        <div className="absolute top-0 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"></div>
+        <div className="absolute bottom-0 left-1/4 w-1/2 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
+        <div className="absolute left-0 top-1/4 h-1/2 w-px bg-gradient-to-b from-transparent via-indigo-500 to-transparent opacity-30"></div>
+        <div className="absolute right-0 top-1/4 h-1/2 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent opacity-30"></div>
+        
+        {/* Header with gradient - Compact */}
+        <div className="relative flex items-center justify-between px-4 py-3 border-b border-indigo-500/30 bg-gradient-to-r from-indigo-900/20 to-blue-900/20">
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg blur opacity-50"></div>
+              <div className="relative bg-gradient-to-br from-indigo-500 to-blue-600 p-2 rounded-lg shadow-lg">
+                <GraduationCap className="h-4 w-4 text-white" />
+              </div>
+            </div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">Teacher Login</h2>
+          </div>
           <button 
             onClick={onClose} 
-            className="text-gray-300 hover:text-white hover:bg-white/10 p-2 rounded-xl transition-all duration-300"
+            className="group relative text-gray-400 hover:text-white p-1.5 rounded-lg transition-all duration-300 hover:bg-red-500/20 border border-transparent hover:border-red-500/50"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5 relative z-10" />
+            <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 rounded-lg transition-all duration-300"></div>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="space-y-6">
+        {/* Form - Compact */}
+        <form onSubmit={handleSubmit} className="p-4">
+          <div className="space-y-3">
             {error && (
-              <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-xl p-4">
-                <p className="text-red-200 text-sm">{error}</p>
+              <div className="mb-3 p-2.5 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-xs flex items-start space-x-2 backdrop-blur-sm">
+                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-400" />
+                <div>
+                  <p className="font-medium text-red-200 mb-0.5">Error</p>
+                  <p className="text-red-300">{error}</p>
+                </div>
               </div>
             )}
 
+            {/* Email Field - Compact */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
                 Email Address
               </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <User className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-indigo-400 transition-colors" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white placeholder-gray-400 transition-all duration-300"
-                  placeholder="Enter your email"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-600/50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-white text-sm placeholder-slate-400 backdrop-blur-sm"
+                  placeholder="teacher@example.com"
                   required
                 />
               </div>
             </div>
 
+            {/* Password Field - Compact */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
                 Password
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <Lock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-indigo-400 transition-colors" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white placeholder-gray-400 transition-all duration-300"
+                  className="w-full pl-9 pr-10 py-2 bg-slate-800/50 border border-slate-600/50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-white text-sm placeholder-slate-400 backdrop-blur-sm"
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-400 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
+            {/* Demo Credentials Info */}
+            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-2.5 backdrop-blur-sm">
+              <div className="flex items-start space-x-1.5">
+                <GraduationCap className="h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0" />
+                <div className="text-[10px] text-indigo-200">
+                  <p className="font-semibold mb-0.5">Demo Credentials:</p>
+                  <p className="text-indigo-300">Email: <span className="font-mono bg-indigo-500/20 px-1 rounded">teacher@example.com</span></p>
+                  <p className="text-indigo-300">Password: <span className="font-mono bg-indigo-500/20 px-1 rounded">password123</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button with futuristic design - Compact */}
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative overflow-hidden w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 px-6 rounded-2xl font-bold shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-1 transition-all duration-300"
+              className="group relative overflow-hidden w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-500 hover:via-blue-500 hover:to-indigo-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2.5 px-4 rounded-lg font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 transition-all duration-300 disabled:transform-none disabled:cursor-not-allowed disabled:shadow-none border border-indigo-400/20"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <span className="relative z-10">
-                {isLoading ? 'Signing In...' : 'Sign In'}
+              {/* Animated shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+              
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/0 via-indigo-400/30 to-indigo-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              <span className="relative z-10 flex items-center justify-center space-x-2">
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <GraduationCap className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </>
+                )}
               </span>
             </button>
           </div>
         </form>
+
+        {/* Footer - Compact */}
+        <div className="px-4 py-2.5 bg-slate-800/30 rounded-b-2xl border-t border-indigo-500/20">
+          <p className="text-center text-[10px] text-slate-400">
+            Secure teacher authentication portal
+          </p>
+        </div>
       </div>
     </div>
   );

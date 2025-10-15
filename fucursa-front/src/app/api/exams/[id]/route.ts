@@ -39,7 +39,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { title, description, timeLimit, timeLimitSeconds, timePerQuestion, timingMode, status, instructions, startDate, endDate, maxAttempts } = body;
+    const { title, description, timeLimit, timeLimitSeconds, timePerQuestion, timingMode, status, instructions, startDate, endDate, maxAttempts, requireEdpCode, edpCodes } = body;
 
     // Check if exam exists
     const existingExam = await Database.getExamById(params.id);
@@ -63,7 +63,9 @@ export async function PUT(
       instructions,
       startDate,
       endDate,
-      maxAttempts
+      maxAttempts,
+      requireEdpCode,
+      edpCodes
     });
 
     const response: ApiResponse<Exam> = {
