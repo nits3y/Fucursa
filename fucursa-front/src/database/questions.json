@@ -1,0 +1,274 @@
+{
+  "questions": [
+    {
+      "id": "question_1704067200000_q1",
+      "examId": "exam_1704067200000_xyz789abc",
+      "question": "What is the derivative of x²?",
+      "type": "multiple-choice",
+      "options": [
+        "2x",
+        "x",
+        "2",
+        "x²"
+      ],
+      "correctAnswer": "2x",
+      "points": 1,
+      "order": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2025-10-15T02:17:48.844Z",
+      "explanation": "The derivative of x² is 2x using the power rule."
+    },
+    {
+      "id": "question_1704067200000_q2",
+      "examId": "exam_1704067200000_xyz789abc",
+      "question": "Solve for x: 2x + 5 = 15",
+      "type": "multiple-choice",
+      "options": [
+        "5",
+        "10",
+        "7.5",
+        "20"
+      ],
+      "correctAnswer": "5",
+      "points": 1,
+      "order": 2,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2025-10-15T02:18:05.085Z",
+      "explanation": "2x + 5 = 15, so 2x = 10, therefore x = 5."
+    },
+    {
+      "id": "question_1704067200000_q3",
+      "examId": "exam_1704067200000_xyz789abc",
+      "question": "Explain the Pythagorean theorem and provide an example.",
+      "type": "essay",
+      "points": 1,
+      "order": 3,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2025-10-15T02:18:20.125Z",
+      "explanation": "The Pythagorean theorem states that in a right triangle, the square of the hypotenuse equals the sum of the squares of the other two sides.",
+      "correctAnswer": ""
+    },
+    {
+      "id": "question_1704067200000_q4",
+      "examId": "exam_1704067200000_xyz789abc",
+      "question": "The sum of angles in a triangle is always 180 degrees.",
+      "type": "true-false",
+      "correctAnswer": "True",
+      "points": 1,
+      "order": 4,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2025-10-15T02:18:32.549Z",
+      "explanation": "This is a fundamental property of triangles in Euclidean geometry."
+    },
+    {
+      "id": "question_1760494826810_epp2mkkwo",
+      "examId": "exam_1704067200000_xyz789abc",
+      "question": "Full name of your instructor",
+      "type": "multiple-choice",
+      "options": [
+        "Yestin Rado",
+        "Yestin Roy Prado A.",
+        "Yestin Roy A. Prado",
+        "Yestin Prado Ry"
+      ],
+      "correctAnswer": "Yestin Roy A. Prado",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T02:20:26.810Z",
+      "updatedAt": "2025-10-15T02:20:26.810Z"
+    },
+    {
+      "id": "question_1760502120202_uiul58240",
+      "examId": "exam_1760502030733_3myzvdgiz",
+      "question": "what is the output of the code? \nprintf(\"Hello Word!\");",
+      "type": "identification",
+      "correctAnswer": "Hello Word!",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:22:00.203Z",
+      "updatedAt": "2025-10-15T04:22:00.203Z"
+    },
+    {
+      "id": "question_1760502458144_nwyzm347d",
+      "examId": "exam_1760502030733_3myzvdgiz",
+      "question": "The purpose of print statement in C is to print out message.",
+      "type": "true-false",
+      "correctAnswer": "True",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:27:38.144Z",
+      "updatedAt": "2025-10-15T04:27:38.144Z"
+    },
+    {
+      "id": "question_1760502490103_9qcsgxcvi",
+      "examId": "exam_1760502030733_3myzvdgiz",
+      "question": "variables in C use to store images in C programming",
+      "type": "true-false",
+      "correctAnswer": "False",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:28:10.103Z",
+      "updatedAt": "2025-10-15T04:28:10.103Z"
+    },
+    {
+      "id": "question_1760503748921_tys1uk2wn",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "The physical parts of a computer system that you can touch and see.",
+      "type": "identification",
+      "correctAnswer": "Hardware",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:08.922Z",
+      "updatedAt": "2025-10-15T04:49:08.922Z"
+    },
+    {
+      "id": "question_1760503750084_l42o3wlhq",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "A set of instructions that tells a computer what to do.",
+      "type": "identification",
+      "correctAnswer": "Software",
+      "points": 1,
+      "order": 1,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:10.084Z",
+      "updatedAt": "2025-10-15T04:49:10.084Z"
+    },
+    {
+      "id": "question_1760503751901_kiq8zi0qh",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "The process of converting data into a form that is meaningful and useful.",
+      "type": "identification",
+      "correctAnswer": "Processing",
+      "points": 1,
+      "order": 2,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:11.901Z",
+      "updatedAt": "2025-10-15T04:49:11.901Z"
+    },
+    {
+      "id": "question_1760503752501_5h7fos531",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "The Central Processing Unit (CPU) is also known as the 'brain' of the computer.",
+      "type": "true-false",
+      "correctAnswer": "True",
+      "points": 1,
+      "order": 3,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:12.501Z",
+      "updatedAt": "2025-10-15T04:49:12.501Z"
+    },
+    {
+      "id": "question_1760503754221_cdzgw9aiu",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "The World Wide Web (WWW) and the Internet are exactly the same thing.",
+      "type": "true-false",
+      "correctAnswer": "False",
+      "points": 1,
+      "order": 4,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:14.221Z",
+      "updatedAt": "2025-10-15T04:49:14.221Z"
+    },
+    {
+      "id": "question_1760503755052_qzn6twipf",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "Binary numbers are made up of only two digits: 0 and 1.",
+      "type": "true-false",
+      "correctAnswer": "True",
+      "points": 1,
+      "order": 5,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:15.052Z",
+      "updatedAt": "2025-10-15T04:49:15.052Z"
+    },
+    {
+      "id": "question_1760503755687_ajl16mt40",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "Which of the following is an example of system software?",
+      "type": "multiple-choice",
+      "options": [
+        "Microsoft Word",
+        "Google Chrome",
+        "Windows 10",
+        "Adobe Photoshop"
+      ],
+      "correctAnswer": "Windows 10",
+      "points": 1,
+      "order": 6,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:15.687Z",
+      "updatedAt": "2025-10-15T04:49:15.687Z"
+    },
+    {
+      "id": "question_1760503756724_esbffbjj0",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "What does CPU stand for?",
+      "type": "multiple-choice",
+      "options": [
+        "Central Process Unit",
+        "Central Processing Unit",
+        "Control Processing Unit",
+        "Central Power Unit"
+      ],
+      "correctAnswer": "Central Processing Unit",
+      "points": 1,
+      "order": 7,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:16.724Z",
+      "updatedAt": "2025-10-15T04:49:16.724Z"
+    },
+    {
+      "id": "question_1760503757020_5j97v0vj7",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "Which of the following represents the correct information processing cycle?",
+      "type": "multiple-choice",
+      "options": [
+        "Input → Output → Storage → Processing",
+        "Processing → Input → Output → Storage",
+        "Input → Processing → Output → Storage",
+        "Input → Storage → Processing → Output"
+      ],
+      "correctAnswer": "Input → Processing → Output → Storage",
+      "points": 1,
+      "order": 8,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:17.020Z",
+      "updatedAt": "2025-10-15T04:49:17.020Z"
+    },
+    {
+      "id": "question_1760503758093_l56q7tphc",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "What type of computer memory is temporary and is erased when power is turned off?",
+      "type": "multiple-choice",
+      "options": [
+        "ROM",
+        "Hard Drive",
+        "RAM",
+        "Flash Drive"
+      ],
+      "correctAnswer": "RAM",
+      "points": 1,
+      "order": 9,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:49:18.093Z",
+      "updatedAt": "2025-10-15T04:49:18.093Z"
+    },
+    {
+      "id": "question_1760504329557_3xfovn6jf",
+      "examId": "exam_1760503220525_en858pqc6",
+      "question": "Full name of your IT IC 11 instructor? (Firstname M.I. Format)",
+      "type": "short-answer",
+      "correctAnswer": "Yestin Roy A. Prado",
+      "points": 1,
+      "order": 0,
+      "isRequired": true,
+      "createdAt": "2025-10-15T04:58:49.557Z",
+      "updatedAt": "2025-10-15T04:58:49.558Z"
+    }
+  ]
+}

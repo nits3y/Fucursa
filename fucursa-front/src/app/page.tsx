@@ -3,11 +3,18 @@
 import { useState } from 'react';
 import LoginModal from '@/components/LoginModal';
 import JoinExamModal from '@/components/JoinExamModal';
+import TeacherLoginModal from '@/components/TeacherLoginModal';
 import { BookOpen, GraduationCap, Users, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showJoinExamModal, setShowJoinExamModal] = useState(false);
+  const [showTeacherLoginModal, setShowTeacherLoginModal] = useState(false);
+
+  const handleTeacherLoginSuccess = (teacher: any) => {
+    // Redirect to dashboard
+    window.location.href = '/dashboard';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -44,7 +51,7 @@ export default function Home() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 mb-16">
           <button
-            onClick={() => setShowLoginModal(true)}
+            onClick={() => setShowTeacherLoginModal(true)}
             className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-2 transition-all duration-300 flex items-center space-x-4 min-w-[240px] justify-center"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -83,8 +90,11 @@ export default function Home() {
       </div>
 
       {/* Modals */}
-      {showLoginModal && (
-        <LoginModal onClose={() => setShowLoginModal(false)} />
+      {showTeacherLoginModal && (
+        <TeacherLoginModal 
+          onClose={() => setShowTeacherLoginModal(false)} 
+          onLoginSuccess={handleTeacherLoginSuccess}
+        />
       )}
       {showJoinExamModal && (
         <JoinExamModal onClose={() => setShowJoinExamModal(false)} />

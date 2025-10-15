@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, User, Hash, Users, AlertCircle } from 'lucide-react';
+import { examApi, apiUtils } from '@/lib/api';
 
 interface JoinExamModalProps {
   onClose: () => void;
@@ -36,15 +37,30 @@ export default function JoinExamModal({ onClose }: JoinExamModalProps) {
         return;
       }
 
-      // TODO: Implement actual exam validation with backend
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Validate exam ID exists and is active
+      const examResponse = await examApi.getById(examId.trim());
       
-      // For demo purposes, accept any valid format
-      // In real implementation, validate exam ID exists and is active
-      
-      // Store student info in localStorage for demo
+      if (!apiUtils.isSuccess(examResponse)) {
+        setError('Exam not found. Please check the exam ID and try again.');
+        return;
+      }
+
+      const exam = apiUtils.getData(examResponse);
+      if (!exam) {
+        setError('Exam not found. Please check the exam ID and try again.');
+        return;
+      }
+
+      // Check if exam is active
+      if (exam.status !== 'active') {
+        setError('This exam is not currently active. Please contact your teacher.');
+        return;
+      }
+
+      // Store student info in localStorage
       localStorage.setItem('studentInfo', JSON.stringify({
         fullName: fullName.trim(),
+        email: '', // Will be filled later if needed
         examId: examId.trim(),
         joinTime: new Date().toISOString()
       }));
@@ -53,6 +69,7 @@ export default function JoinExamModal({ onClose }: JoinExamModalProps) {
       window.location.href = `/exam/${examId}`;
       
     } catch (err) {
+      console.error('Failed to join exam:', err);
       setError('Failed to join exam. Please check your exam ID and try again.');
     } finally {
       setIsLoading(false);
@@ -90,9 +107,12 @@ export default function JoinExamModal({ onClose }: JoinExamModalProps) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           {error && (
-                         <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-start space-x-2 backdrop-blur-sm">
-                             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-400" />
-              <span>{error}</span>
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-start space-x-3 backdrop-blur-sm">
+              <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0 text-red-400" />
+              <div>
+                <p className="font-medium text-red-200 mb-1">Error</p>
+                <p className="text-red-300">{error}</p>
+              </div>
             </div>
           )}
 
@@ -130,14 +150,22 @@ export default function JoinExamModal({ onClose }: JoinExamModalProps) {
                   id="examId"
                   type="text"
                   value={examId}
-                  onChange={(e) => setExamId(e.target.value.toUpperCase())}
+                  onChange={(e) => setExamId(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-white placeholder-slate-400 backdrop-blur-sm font-mono"
-                  placeholder="EXAM123"
+                  placeholder="exam_1704067200000_xyz789abc"
                   required
                 />
               </div>
               <p className="mt-1 text-xs text-slate-400">
                 Enter the exam ID provided by your teacher
+              </p>
+              <p className="mt-1 text-xs text-blue-400">
+                💡 Test with: <span 
+                  className="font-mono bg-blue-500/20 px-1 rounded cursor-pointer hover:bg-blue-500/30 transition-colors"
+                  onClick={() => setExamId('exam_1704067200000_xyz789abc')}
+                >
+                  exam_1704067200000_xyz789abc
+                </span>
               </p>
             </div>
 

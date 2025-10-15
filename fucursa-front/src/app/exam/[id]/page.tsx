@@ -4,29 +4,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Clock, AlertTriangle, Shield, Eye, EyeOff } from 'lucide-react';
 import CountdownTimer from '../../components/CountdownTimer';
+import { examApi, questionApi, studentResponseApi, apiUtils } from '@/lib/api';
+import { Exam, Question, StudentInfo } from '@/types/database';
 
-interface Question {
-  id: string;
-  question: string;
-  type: 'multiple-choice' | 'essay' | 'true-false';
-  options?: string[];
-  correctAnswer?: string;
-}
-
-interface ExamData {
-  id: string;
-  title: string;
-  description: string;
-  timeLimit: number;
-  questions: Question[];
-}
+// Remove duplicate Question interface since it's imported from types
 
 export default function ExamPage() {
   const params = useParams();
   const examId = params.id as string;
   
-  const [studentInfo, setStudentInfo] = useState<any>(null);
-  const [examData, setExamData] = useState<ExamData | null>(null);
+  const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
+  const [examData, setExamData] = useState<Exam | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
@@ -38,44 +28,103 @@ export default function ExamPage() {
   const [isReenteringFullscreen, setIsReenteringFullscreen] = useState(false);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [isSubmittingExam, setIsSubmittingExam] = useState(false);
+  const [questionTimeSpent, setQuestionTimeSpent] = useState<{ [key: string]: number }>({});
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const securityCheckRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Mock exam data
-  const mockExamData: ExamData = {
-    id: examId,
-    title: 'Mathematics Final Exam',
-    description: 'Comprehensive exam covering algebra, geometry, and calculus topics.',
-    timeLimit: 1,
-    questions: [
-      {
-        id: '1',
-        question: 'What is the derivative of x²?',
-        type: 'multiple-choice',
-        options: ['2x', 'x', '2', 'x²'],
-        correctAnswer: '2x'
-      },
-      {
-        id: '2',
-        question: 'Solve for x: 2x + 5 = 15',
-        type: 'multiple-choice',
-        options: ['5', '10', '7.5', '20'],
-        correctAnswer: '5'
-      },
-      {
-        id: '3',
-        question: 'Explain the Pythagorean theorem and provide an example.',
-        type: 'essay'
-      },
-      {
-        id: '4',
-        question: 'The sum of angles in a triangle is always 180 degrees.',
-        type: 'true-false',
-        options: ['True', 'False'],
-        correctAnswer: 'True'
+  // Load exam data
+  useEffect(() => {
+    loadExamData();
+  }, [examId]);
+
+  const loadExamData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load exam data
+      const examResponse = await examApi.getById(examId);
+      if (!apiUtils.isSuccess(examResponse)) {
+        alert('Exam not found. Please check the exam ID and try again.');
+        window.location.href = '/';
+        return;
       }
-    ]
+
+      const exam = apiUtils.getData(examResponse);
+      if (!exam) {
+        alert('Exam not found. Please check the exam ID and try again.');
+        window.location.href = '/';
+        return;
+      }
+
+      // Check if exam is active
+      if (exam.status !== 'active') {
+        alert('This exam is not currently active. Please contact your teacher.');
+        window.location.href = '/';
+        return;
+      }
+
+      setExamData(exam);
+      
+      // Set time based on timePerQuestion (default mode)
+      const timeInSeconds = exam.timePerQuestion || exam.timeLimitSeconds || (exam.timeLimit * 60) || 60;
+      setTimeRemaining(timeInSeconds);
+
+      // Check if student has already submitted a response for this exam
+      const storedStudentInfo = localStorage.getItem('studentInfo');
+      if (storedStudentInfo) {
+        const studentInfo = JSON.parse(storedStudentInfo);
+        const responsesResponse = await fetch(`/api/student-responses?examId=${examId}`);
+        if (responsesResponse.ok) {
+          const responsesData = await responsesResponse.json();
+          if (responsesData.success && responsesData.data) {
+            const alreadySubmitted = responsesData.data.some((resp: any) => {
+              return (
+                (studentInfo.email && resp.studentEmail && 
+                 studentInfo.email.toLowerCase() === resp.studentEmail.toLowerCase()) ||
+                (studentInfo.fullName && resp.studentName && 
+                 studentInfo.fullName.toLowerCase() === resp.studentName.toLowerCase())
+              );
+            });
+            
+            if (alreadySubmitted) {
+              alert('You have already submitted a response for this exam. Each student can only submit once.');
+              window.location.href = '/';
+              return;
+            }
+          }
+        }
+      }
+
+      // Load questions
+      const questionsResponse = await questionApi.getByExam(examId);
+      if (apiUtils.isSuccess(questionsResponse)) {
+        const examQuestions = apiUtils.getData(questionsResponse);
+        if (examQuestions && examQuestions.length > 0) {
+          // Randomize question order using Fisher-Yates shuffle algorithm
+          const shuffledQuestions = [...examQuestions];
+          for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+          }
+          setQuestions(shuffledQuestions);
+        } else {
+          alert('This exam has no questions yet. Please contact your teacher.');
+          window.location.href = '/';
+          return;
+        }
+      } else {
+        alert('Failed to load exam questions. Please try again.');
+        window.location.href = '/';
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to load exam data:', error);
+      alert('Failed to load exam. Please try again.');
+      window.location.href = '/';
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Security functions
@@ -198,7 +247,7 @@ export default function ExamPage() {
     }
   };
 
-  // Initialize exam
+  // Initialize student info
   useEffect(() => {
     const storedStudentInfo = localStorage.getItem('studentInfo');
     if (!storedStudentInfo) {
@@ -208,9 +257,7 @@ export default function ExamPage() {
 
     const parsedStudentInfo = JSON.parse(storedStudentInfo);
     setStudentInfo(parsedStudentInfo);
-    setExamData(mockExamData);
-    setTimeRemaining(mockExamData.timeLimit * 60); // Convert to seconds
-  }, [examId]);
+  }, []);
 
   // Security monitoring
   useEffect(() => {
@@ -270,6 +317,14 @@ export default function ExamPage() {
     };
   }, [examStarted, securityWarnings, isReenteringFullscreen, isSubmittingExam]);
 
+  // Reset timer when question changes (always per-question mode now)
+  useEffect(() => {
+    if (examStarted && examData) {
+      const timeInSeconds = examData.timePerQuestion || examData.timeLimitSeconds || (examData.timeLimit * 60) || 60;
+      setTimeRemaining(timeInSeconds);
+    }
+  }, [currentQuestion, examStarted, examData?.timePerQuestion, examData?.timeLimitSeconds, examData?.timeLimit]);
+
   // Timer
   useEffect(() => {
     if (!examStarted || timeRemaining <= 0) return;
@@ -277,8 +332,17 @@ export default function ExamPage() {
     timerRef.current = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          handleSubmitExam(true);
-          return 0;
+          // Per-question mode: move to next question when time expires
+          if (currentQuestion < questions.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
+            // Timer will be reset by the useEffect above
+            const timeInSeconds = examData?.timePerQuestion || examData?.timeLimitSeconds || (examData ? examData.timeLimit * 60 : 60) || 60;
+            return timeInSeconds;
+          } else {
+            // Last question, submit exam
+            handleSubmitExam(true);
+            return 0;
+          }
         }
         return prev - 1;
       });
@@ -289,7 +353,7 @@ export default function ExamPage() {
         clearInterval(timerRef.current);
       }
     };
-  }, [examStarted, timeRemaining]);
+  }, [examStarted, timeRemaining, currentQuestion, questions.length, examData?.timePerQuestion, examData?.timeLimitSeconds, examData?.timeLimit]);
 
   const startExam = async () => {
     await enterFullscreen();
@@ -314,18 +378,46 @@ export default function ExamPage() {
     // Stop countdown timer
     stopCountdown();
 
-    // TODO: Submit answers to backend
-    console.log('Submitting exam:', {
-      studentInfo,
-      examId,
-      answers,
-      timeUsed: (examData!.timeLimit * 60) - timeRemaining,
-      securityWarnings,
-      autoSubmit
-    });
+    try {
+      if (!studentInfo || !examData) {
+        alert('Missing student or exam information');
+        return;
+      }
 
-    setIsExamSubmitted(true);
-    await exitFullscreen();
+      const timeSpent = (examData.timeLimit * 60) - timeRemaining;
+      
+      const responseData = {
+        examId,
+      studentInfo,
+      answers,
+        timeSpent,
+        isAutoSubmitted: autoSubmit,
+        securityWarnings
+      };
+
+      const response = await studentResponseApi.submit(responseData);
+      
+      if (apiUtils.isSuccess(response)) {
+        console.log('Exam submitted successfully:', response.data);
+        setIsExamSubmitted(true);
+        await exitFullscreen();
+      } else {
+        const errorMessage = apiUtils.handleError(response);
+        // Check if it's a duplicate submission error
+        if (errorMessage.includes('already submitted')) {
+          alert('⚠️ Duplicate Submission Detected\n\n' + errorMessage + '\n\nYou will be redirected to the home page.');
+          window.location.href = '/';
+        } else {
+          alert('Failed to submit exam: ' + errorMessage);
+        }
+        // Reset the flag to allow the user to try again if it's not a duplicate
+        setIsSubmittingExam(false);
+      }
+    } catch (error) {
+      console.error('Failed to submit exam:', error);
+      alert('Failed to submit exam. Please try again.');
+      setIsSubmittingExam(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -339,7 +431,7 @@ export default function ExamPage() {
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (!studentInfo || !examData) {
+  if (loading || !studentInfo || !examData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -413,12 +505,14 @@ export default function ExamPage() {
               <span className="text-white font-mono">{examId}</span>
             </div>
             <div className="flex items-center justify-between p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-              <span className="font-medium text-gray-300">Time Limit:</span>
-              <span className="text-white font-medium">{examData.timeLimit} minutes</span>
+              <span className="font-medium text-gray-300">Time Per Question:</span>
+              <span className="text-white font-medium">
+                {examData.timePerQuestion || examData.timeLimitSeconds || (examData.timeLimit * 60) || 60} seconds
+              </span>
             </div>
             <div className="flex items-center justify-between p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
               <span className="font-medium text-gray-300">Questions:</span>
-              <span className="text-white font-medium">{examData.questions.length}</span>
+              <span className="text-white font-medium">{questions.length}</span>
             </div>
           </div>
 
@@ -461,7 +555,7 @@ export default function ExamPage() {
     );
   }
 
-  const currentQ = examData.questions[currentQuestion];
+  const currentQ = questions[currentQuestion];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-white relative overflow-hidden">
@@ -493,7 +587,7 @@ export default function ExamPage() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3 bg-black/30 backdrop-blur-sm px-5 py-2 rounded-full border border-white/20 shadow-lg">
               <Clock className="h-5 w-5 text-blue-400" />
-              <span className={`font-mono font-bold text-lg ${timeRemaining < 300 ? 'text-red-300 animate-pulse' : 'text-white'}`}>
+              <span className={`font-mono font-bold text-lg ${timeRemaining < 10 ? 'text-red-300 animate-pulse' : 'text-white'}`}>
                 {formatTime(timeRemaining)}
               </span>
             </div>
@@ -508,17 +602,17 @@ export default function ExamPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center space-x-4 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-lg mb-4">
               <span className="text-white font-semibold">
-                Question {currentQuestion + 1} of {examData.questions.length}
+                Question {currentQuestion + 1} of {questions.length}
               </span>
               <div className="w-px h-4 bg-white/30"></div>
               <span className="text-blue-300 font-semibold">
-                {Math.round(((currentQuestion + 1) / examData.questions.length) * 100)}% Complete
+                {questions.length > 0 ? Math.round(((currentQuestion + 1) / questions.length) * 100) : 0}% Complete
               </span>
             </div>
             <div className="w-full bg-white/10 backdrop-blur-sm rounded-full h-2 border border-white/20 shadow-inner">
               <div
                 className="bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 h-2 rounded-full transition-all duration-700 shadow-lg relative"
-                style={{ width: `${((currentQuestion + 1) / examData.questions.length) * 100}%` }}
+                style={{ width: `${questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0}%` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full"></div>
               </div>
@@ -538,7 +632,8 @@ export default function ExamPage() {
 
               {currentQ.type === 'multiple-choice' || currentQ.type === 'true-false' ? (
                 <div className="space-y-4 max-w-2xl mx-auto">
-                  {currentQ.options?.map((option, index) => (
+                  {/* For true-false, create options if they don't exist */}
+                  {(currentQ.type === 'true-false' && !currentQ.options ? ['True', 'False'] : currentQ.options)?.map((option, index) => (
                     <label
                       key={index}
                       className="group flex items-center space-x-5 p-6 bg-white/10 backdrop-blur-sm rounded-2xl hover:bg-white/20 cursor-pointer transition-all duration-300 border border-white/20 hover:border-white/40 transform hover:-translate-y-1 hover:shadow-2xl"
@@ -577,6 +672,16 @@ export default function ExamPage() {
                     placeholder="Type your detailed answer here..."
                   />
                 </div>
+              ) : currentQ.type === 'identification' || currentQ.type === 'short-answer' || currentQ.type === 'fill-in-blank' ? (
+                <div className="max-w-2xl mx-auto">
+                  <input
+                    type="text"
+                    value={answers[currentQ.id] || ''}
+                    onChange={(e) => handleAnswerChange(currentQ.id, e.target.value)}
+                    className="w-full p-6 bg-white/10 backdrop-blur-sm border border-white/30 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white placeholder-gray-400 transition-all duration-300 text-lg shadow-inner"
+                    placeholder="Type your answer here..."
+                  />
+                </div>
               ) : null}
             </div>
           </div>
@@ -591,7 +696,7 @@ export default function ExamPage() {
               ← Previous
             </button>
 
-            {currentQuestion === examData.questions.length - 1 ? (
+            {currentQuestion === questions.length - 1 ? (
               <button
                 onClick={() => handleSubmitExam(false)}
                 className="group relative overflow-hidden px-12 py-4 bg-gradient-to-r from-green-600 via-green-500 to-green-600 hover:from-green-500 hover:via-green-400 hover:to-green-500 text-white rounded-2xl font-bold shadow-2xl hover:shadow-green-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
@@ -601,7 +706,7 @@ export default function ExamPage() {
               </button>
             ) : (
               <button
-                onClick={() => setCurrentQuestion(Math.min(examData.questions.length - 1, currentQuestion + 1))}
+                onClick={() => setCurrentQuestion(Math.min(questions.length - 1, currentQuestion + 1))}
                 className="group relative overflow-hidden px-10 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-500 hover:via-blue-400 hover:to-blue-500 text-white rounded-2xl font-bold shadow-2xl hover:shadow-blue-500/30 transform hover:-translate-y-1 transition-all duration-300 text-lg"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
