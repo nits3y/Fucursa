@@ -163,9 +163,51 @@ export default function ExamDetailsPage() {
     }
   };
 
+  // Format date to readable format with 12-hour time
+  // Example: "October 15, 2025 at 4:21 PM"
+  const formatDeadline = (dateString: string) => {
+    const date = new Date(dateString);
+    
+    // Format date: "October 15, 2025"
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    const formattedDate = date.toLocaleDateString('en-US', dateOptions);
+    
+    // Format time: "4:21 PM"
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+    const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+    
+    return `${formattedDate} at ${formattedTime}`;
+  };
+
+  // Check if exam deadline has passed
+  // Returns true if current time is past the exam's endDate
+  const isExamClosed = () => {
+    if (!exam?.endDate) return false;
+    const now = new Date();
+    const deadline = new Date(exam.endDate);
+    return now > deadline;
+  };
+
+  // Get the display status - if exam has active status but deadline passed, show "Closed"
+  const getDisplayStatus = () => {
+    if (exam?.status === 'active' && isExamClosed()) {
+      return 'closed';
+    }
+    return exam?.status || 'draft';
+  };
+
   const getStatusBadge = (status: string) => {
     const styles = {
       active: 'bg-green-500/20 text-green-300 border-green-500/30',
+      closed: 'bg-red-500/20 text-red-300 border-red-500/30',
       completed: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
       draft: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
       archived: 'bg-red-500/20 text-red-300 border-red-500/30'
@@ -254,7 +296,7 @@ export default function ExamDetailsPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <h2 className="text-xl font-bold text-white">{exam.title}</h2>
-              {getStatusBadge(exam.status)}
+              {getStatusBadge(getDisplayStatus())}
             </div>
           </div>
           <p className="text-gray-300 text-sm mb-3">{exam.description}</p>
@@ -288,7 +330,7 @@ export default function ExamDetailsPage() {
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-orange-300">Exam Deadline</p>
                   <p className="text-xs text-gray-300">
-                    {new Date(exam.endDate).toLocaleString()} - Exam will automatically close after this time
+                    {formatDeadline(exam.endDate)} - Exam will automatically close after this time
                   </p>
                 </div>
               </div>

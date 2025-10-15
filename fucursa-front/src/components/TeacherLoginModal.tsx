@@ -140,18 +140,6 @@ export default function TeacherLoginModal({ onClose, onLoginSuccess }: TeacherLo
               </div>
             </div>
 
-            {/* Demo Credentials Info */}
-            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-2.5 backdrop-blur-sm">
-              <div className="flex items-start space-x-1.5">
-                <GraduationCap className="h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0" />
-                <div className="text-[10px] text-indigo-200">
-                  <p className="font-semibold mb-0.5">Demo Credentials:</p>
-                  <p className="text-indigo-300">Email: <span className="font-mono bg-indigo-500/20 px-1 rounded">teacher@example.com</span></p>
-                  <p className="text-indigo-300">Password: <span className="font-mono bg-indigo-500/20 px-1 rounded">password123</span></p>
-                </div>
-              </div>
-            </div>
-
             {/* Submit Button with futuristic design - Compact */}
             <button
               type="submit"

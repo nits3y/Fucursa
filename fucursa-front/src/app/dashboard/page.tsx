@@ -23,9 +23,27 @@ export default function Dashboard() {
   const [teacherName, setTeacherName] = useState('Teacher');
   const [avatarColor, setAvatarColor] = useState('');
 
+  // Check if exam deadline has passed
+  // Returns true if current time is past the exam's endDate
+  const isExamClosed = (exam: Exam) => {
+    if (!exam.endDate) return false;
+    const now = new Date();
+    const deadline = new Date(exam.endDate);
+    return now > deadline;
+  };
+
+  // Get the display status - if exam has active status but deadline passed, show "Closed"
+  const getDisplayStatus = (exam: Exam) => {
+    if (exam.status === 'active' && isExamClosed(exam)) {
+      return 'closed';
+    }
+    return exam.status;
+  };
+
   const getStatusBadge = (status: string) => {
     const styles = {
       active: 'bg-green-500/20 text-green-300 border-green-500/30 shadow-lg shadow-green-500/10',
+      closed: 'bg-red-500/20 text-red-300 border-red-500/30 shadow-lg shadow-red-500/10',
       completed: 'bg-gray-500/20 text-gray-300 border-gray-500/30 shadow-lg shadow-gray-500/10',
       draft: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30 shadow-lg shadow-yellow-500/10'
     };
@@ -149,19 +167,19 @@ export default function Dashboard() {
     }
   };
 
-  const handleCopyLink = (examId: string) => {
-    const examUrl = `${window.location.origin}/exam/${examId}`;
-    navigator.clipboard.writeText(examUrl).then(() => {
-      toast.success('Exam link copied to clipboard!');
+  const handleCopyCode = (examId: string) => {
+    // Copy just the exam ID/code instead of the full URL
+    navigator.clipboard.writeText(examId).then(() => {
+      toast.success('Exam code copied to clipboard!');
     }).catch(() => {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
-      textArea.value = examUrl;
+      textArea.value = examId;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      toast.success('Exam link copied to clipboard!');
+      toast.success('Exam code copied to clipboard!');
     });
   };
 
@@ -310,7 +328,7 @@ export default function Dashboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="text-base font-semibold text-white">{exam.title}</h3>
-                          {getStatusBadge(exam.status)}
+                          {getStatusBadge(getDisplayStatus(exam))}
                         </div>
                         <p className="text-gray-300 text-sm mb-3">{exam.description}</p>
                         
@@ -358,10 +376,10 @@ export default function Dashboard() {
                             ID: <code className="bg-green-500/20 px-1.5 py-0.5 rounded font-mono text-green-200">{exam.id}</code>
                           </span>
                           <button 
-                            onClick={() => handleCopyLink(exam.id)}
+                            onClick={() => handleCopyCode(exam.id)}
                             className="text-xs text-green-300 hover:text-green-200 font-medium hover:bg-green-500/20 px-2 py-1 rounded transition-all duration-300"
                           >
-                            Copy Link
+                            Copy Code
                           </button>
                         </div>
                       </div>
@@ -429,6 +447,7 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
   const [description, setDescription] = useState('');
   const [timePerQuestion, setTimePerQuestion] = useState(60);
   const [instructions, setInstructions] = useState('');
+  const [enableDeadline, setEnableDeadline] = useState(false);
   const [deadlineDate, setDeadlineDate] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
   const [requireEdpCode, setRequireEdpCode] = useState(false);
@@ -468,9 +487,9 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
         return;
       }
 
-      // Combine date and time if both are provided
+      // Combine date and time if deadline is enabled and both are provided
       let endDate = undefined;
-      if (deadlineDate && deadlineTime) {
+      if (enableDeadline && deadlineDate && deadlineTime) {
         endDate = `${deadlineDate}T${deadlineTime}`;
       }
 
@@ -632,36 +651,58 @@ function CreateExamModal({ onClose }: { onClose: () => void }) {
                   </p>
                 </div>
 
-                {/* Deadline Section */}
+                {/* Deadline Section with Toggle Switch */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
-                    Exam Deadline (Optional)
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] text-gray-400 mb-1">Date</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-medium text-gray-300">
+                      Exam Deadline
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
                       <input
-                        type="date"
-                        value={deadlineDate}
-                        onChange={(e) => setDeadlineDate(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
-                        style={{ colorScheme: 'dark' }}
+                        type="checkbox"
+                        checked={enableDeadline}
+                        onChange={(e) => setEnableDeadline(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-white/10 border-white/20 rounded focus:ring-blue-500 focus:ring-2"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-gray-400 mb-1">Time</label>
-                      <input
-                        type="time"
-                        value={deadlineTime}
-                        onChange={(e) => setDeadlineTime(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
-                        style={{ colorScheme: 'dark' }}
-                      />
-                    </div>
+                      <span className="text-xs text-gray-300">Set Deadline</span>
+                    </label>
                   </div>
-                  <p className="mt-1 text-[10px] text-gray-400">
-                    📅 Exam will automatically close and stop accepting responses after this date/time
-                  </p>
+                  
+                  {enableDeadline ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] text-gray-400 mb-1">Date</label>
+                          <input
+                            type="date"
+                            value={deadlineDate}
+                            onChange={(e) => setDeadlineDate(e.target.value)}
+                            className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
+                            style={{ colorScheme: 'dark' }}
+                            required={enableDeadline}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-gray-400 mb-1">Time</label>
+                          <input
+                            type="time"
+                            value={deadlineTime}
+                            onChange={(e) => setDeadlineTime(e.target.value)}
+                            className="w-full px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white text-sm transition-all duration-300"
+                            style={{ colorScheme: 'dark' }}
+                            required={enableDeadline}
+                          />
+                        </div>
+                      </div>
+                      <p className="mt-1 text-[10px] text-gray-400">
+                        📅 Exam will automatically close and stop accepting responses after this date/time
+                      </p>
+                    </>
+                  ) : (
+                    <div className="text-center py-6 text-gray-400 text-xs">
+                      <p>Enable deadline to set an automatic closing date/time for the exam</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* EDP Code Section */}

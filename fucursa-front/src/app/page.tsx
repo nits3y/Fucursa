@@ -38,13 +38,18 @@ export default function Home() {
             </div>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4 tracking-tight">
+          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-2 tracking-tight">
             Fucursa
           </h1>
           
+          {/* Credit - Simple "By Yestin" text underneath the title */}
+          <p className="text-gray-400 text-sm font-light mb-8 tracking-wide">
+            By Yestin
+          </p>
+          
           <p className="text-gray-300 text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
             Secure Online Examination Platform
-            <span className="block text-lg text-gray-400 mt-2">with Advanced Anti-Cheating Technology</span>
+            <span className="block text-lg text-gray-400 mt-2">with Anti-Cheating Technology</span>
           </p>
         </div>
 
@@ -67,19 +72,6 @@ export default function Home() {
             <Users className="h-7 w-7 relative z-10" />
             <span className="relative z-10">Join Exam</span>
           </button>
-        </div>
-
-        {/* Author Credit */}
-        <div className="text-center">
-          <div className="inline-flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 hover:bg-white/10 transition-all duration-300 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-white font-bold text-sm">YP</span>
-            </div>
-            <div className="text-left">
-              <p className="text-white font-semibold text-sm">Created by</p>
-              <p className="text-gray-300 text-xs">Yestin Prado</p>
-            </div>
-          </div>
         </div>
 
         {/* Floating Elements */}
