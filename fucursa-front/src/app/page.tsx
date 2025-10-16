@@ -3,11 +3,18 @@
 import { useState } from 'react';
 import LoginModal from '@/components/LoginModal';
 import JoinExamModal from '@/components/JoinExamModal';
+import TeacherLoginModal from '@/components/TeacherLoginModal';
 import { BookOpen, GraduationCap, Users, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showJoinExamModal, setShowJoinExamModal] = useState(false);
+  const [showTeacherLoginModal, setShowTeacherLoginModal] = useState(false);
+
+  const handleTeacherLoginSuccess = (teacher: any) => {
+    // Redirect to dashboard
+    window.location.href = '/dashboard';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -31,20 +38,25 @@ export default function Home() {
             </div>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4 tracking-tight">
+          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent mb-2 tracking-tight">
             Fucursa
           </h1>
           
+          {/* Credit - Simple "By Yestin" text underneath the title */}
+          <p className="text-gray-400 text-sm font-light mb-8 tracking-wide">
+            By Yestin
+          </p>
+          
           <p className="text-gray-300 text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
             Secure Online Examination Platform
-            <span className="block text-lg text-gray-400 mt-2">with Advanced Anti-Cheating Technology</span>
+            <span className="block text-lg text-gray-400 mt-2">with Anti-Cheating Technology</span>
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 mb-16">
           <button
-            onClick={() => setShowLoginModal(true)}
+            onClick={() => setShowTeacherLoginModal(true)}
             className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-2 transition-all duration-300 flex items-center space-x-4 min-w-[240px] justify-center"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -62,19 +74,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Author Credit */}
-        <div className="text-center">
-          <div className="inline-flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 hover:bg-white/10 transition-all duration-300 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-              <span className="text-white font-bold text-sm">YP</span>
-            </div>
-            <div className="text-left">
-              <p className="text-white font-semibold text-sm">Created by</p>
-              <p className="text-gray-300 text-xs">Yestin Prado</p>
-            </div>
-          </div>
-        </div>
-
         {/* Floating Elements */}
         <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-ping opacity-75"></div>
         <div className="absolute top-32 right-32 w-1 h-1 bg-purple-400 rounded-full animate-ping delay-300 opacity-75"></div>
@@ -83,8 +82,11 @@ export default function Home() {
       </div>
 
       {/* Modals */}
-      {showLoginModal && (
-        <LoginModal onClose={() => setShowLoginModal(false)} />
+      {showTeacherLoginModal && (
+        <TeacherLoginModal 
+          onClose={() => setShowTeacherLoginModal(false)} 
+          onLoginSuccess={handleTeacherLoginSuccess}
+        />
       )}
       {showJoinExamModal && (
         <JoinExamModal onClose={() => setShowJoinExamModal(false)} />

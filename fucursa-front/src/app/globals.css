@@ -51,22 +51,30 @@ body {
   user-select: none;
 }
 
-/* Custom scrollbar for better UX */
+/* Hide scrollbar completely for modern UI */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 0px;
+  height: 0px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+/* Firefox scrollbar hide */
+* {
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+/* IE and Edge scrollbar hide */
+body {
+  -ms-overflow-style: none;
 }
 
 /* Animation for modals */

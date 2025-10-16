@@ -1,0 +1,31 @@
+{
+  "teachers": [
+    {
+      "id": "teacher_1704067200000_prado123",
+      "name": "Yestin Roy A. Prado",
+      "email": "yestinprado@gmail.com",
+      "password": "print(pass)",
+      "department": "BSIT Dept.",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "teacher_1704067200000_cabucos456",
+      "name": "Jade Cabucos",
+      "email": "jlcaabucos.cec@gmail.com",
+      "password": "fucursa_exam",
+      "department": "BSIT Dept.",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "teacher_1704067200000_cababan789",
+      "name": "Vince Cababan",
+      "email": "maskvader1027@gmail.com",
+      "password": "fucursa_exam",
+      "department": "BSIT Dept.",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
