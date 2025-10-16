@@ -600,6 +600,29 @@
       "status": "submitted",
       "submittedAt": "2025-10-15T23:31:06.237Z",
       "createdAt": "2025-10-15T23:31:06.237Z"
+    },
+    {
+      "id": "response_1760573077124_e2iteinr8",
+      "examId": "exam_1760513665893_a0a13utoi",
+      "studentId": "student_1760573077123",
+      "studentName": "Alangcas, RJ",
+      "studentEmail": "",
+      "answers": {
+        "question_1760513717875_e1jscx600": "2",
+        "question_1760513762201_euq97cik3": "True",
+        "question_1760513742320_wypsb238o": "4",
+        "question_1760513798903_o3slk0mzz": "3",
+        "question_1760513779517_mz6yyhikk": "1"
+      },
+      "score": 5,
+      "totalPoints": 5,
+      "percentage": 100,
+      "timeSpent": 47,
+      "isAutoSubmitted": false,
+      "securityWarnings": 0,
+      "status": "submitted",
+      "submittedAt": "2025-10-16T00:04:37.124Z",
+      "createdAt": "2025-10-16T00:04:37.125Z"
     }
   ]
 }

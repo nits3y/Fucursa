@@ -230,12 +230,13 @@ export default function EditExamModal({ exam, onClose, onSuccess }: EditExamModa
                       </label>
                       <select
                         value={status}
-                        onChange={(e) => setStatus(e.target.value as 'draft' | 'active' | 'completed' | 'archived')}
+                        onChange={(e) => setStatus(e.target.value as 'draft' | 'active' | 'closed' | 'completed' | 'archived')}
                         className="w-full px-3 py-2 text-sm bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white transition-all duration-300"
                         style={{ colorScheme: 'dark' }}
                       >
                         <option value="draft" className="bg-gray-800 text-white">Draft</option>
                         <option value="active" className="bg-gray-800 text-white">Active</option>
+                        <option value="closed" className="bg-gray-800 text-white">Closed</option>
                         <option value="completed" className="bg-gray-800 text-white">Completed</option>
                         <option value="archived" className="bg-gray-800 text-white">Archived</option>
                       </select>

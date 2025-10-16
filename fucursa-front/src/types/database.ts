@@ -19,7 +19,7 @@ export interface Exam {
   timeLimitSeconds?: number; // in seconds
   timePerQuestion?: number; // in seconds
   timingMode?: 'exam' | 'per-question'; // timing control mode
-  status: 'draft' | 'active' | 'completed' | 'archived';
+  status: 'draft' | 'active' | 'closed' | 'completed' | 'archived';
   createdAt: string;
   updatedAt: string;
   startDate?: string;
